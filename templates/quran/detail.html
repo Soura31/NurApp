@@ -2,14 +2,14 @@
 {% block title %}Sourate {{ chapter.id }}{% endblock %}
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8" data-aos="fade-up">
-  <h1 class="font-amiri text-5xl text-white text-right" dir="rtl" lang="ar">{{ chapter.name_arabic }}</h1>
+  <h1 class="font-amiri text-3xl sm:text-5xl text-white text-right" dir="rtl" lang="ar">{{ chapter.name_arabic }}</h1>
   <p class="text-[#8b949e]">{{ chapter.translated_name.name }} • {{ chapter.verses_count }} versets • {{ chapter.revelation_place|title }}</p>
   {% if chapter.id != 9 %}<p class="font-amiri text-3xl text-center text-[#c9a84c] mt-4" dir="rtl" lang="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>{% endif %}
 
   <div class="sticky top-16 z-40 bg-[#0d1117]/95 backdrop-blur-xl border-b border-[#c9a84c]/10 mt-6 p-3 rounded-xl flex flex-wrap items-center gap-3">
     <form method="get" class="flex flex-wrap items-center gap-3 w-full">
-      <select name="reciter" class="rounded-lg bg-[#161b22] border border-[#c9a84c]/20 px-3 py-2 text-sm text-white">{% for r in reciters %}<option value="{{ r.id }}" {% if r.id|stringformat:'s' == selected_reciter|stringformat:'s' %}selected{% endif %}>{{ r.reciter_name }}</option>{% endfor %}</select>
-      <select name="translation" class="rounded-lg bg-[#161b22] border border-[#c9a84c]/20 px-3 py-2 text-sm text-white">{% for t in translations %}<option value="{{ t.id }}" {% if t.id|stringformat:'s' == selected_translation|stringformat:'s' %}selected{% endif %}>{{ t.name }}</option>{% endfor %}</select>
+      <select name="reciter" class="w-full sm:w-auto rounded-lg bg-[#161b22] border border-[#c9a84c]/20 px-3 py-2 text-sm text-white">{% for r in reciters %}<option value="{{ r.id }}" {% if r.id|stringformat:'s' == selected_reciter|stringformat:'s' %}selected{% endif %}>{{ r.reciter_name }}</option>{% endfor %}</select>
+      <select name="translation" class="w-full sm:w-auto rounded-lg bg-[#161b22] border border-[#c9a84c]/20 px-3 py-2 text-sm text-white">{% for t in translations %}<option value="{{ t.id }}" {% if t.id|stringformat:'s' == selected_translation|stringformat:'s' %}selected{% endif %}>{{ t.name }}</option>{% endfor %}</select>
       <label class="text-sm text-[#8b949e]"><input type="checkbox" name="translit" value="1" {% if show_translit %}checked{% endif %}> Translitteration</label>
       <button class="px-4 py-2 rounded-full text-[#080c10] font-bold" style="background:var(--nur-gold-gradient)">Appliquer</button>
     </form>
@@ -18,16 +18,16 @@
   <div class="mt-6 space-y-4">
     {% for v in verses %}
     <article id="ayah-{{ v.verse_key }}" class="rounded-2xl p-6" style="background:rgba(201,168,76,.02);border:1px solid rgba(201,168,76,.08)">
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
         <span class="h-9 w-9 rounded-lg bg-[#c9a84c]/20 text-[#f0c060] flex items-center justify-center">{{ v.verse_number }}</span>
-        <div class="flex gap-2">
-          <audio controls preload="none" class="h-8">{% if v.audio.url %}<source src="{{ v.audio.url }}">{% endif %}</audio>
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <audio controls preload="none" class="h-8 w-full sm:w-auto">{% if v.audio.url %}<source src="{{ v.audio.url }}">{% endif %}</audio>
           {% if user.is_authenticated %}
           <form method="post" action="/quran/favorites/add/">{% csrf_token %}<input type="hidden" name="surah_number" value="{{ chapter.id }}"><input type="hidden" name="ayah_number" value="{{ v.verse_number }}"><button class="px-2 py-1 rounded border border-[#c9a84c]/30 text-[#c9a84c]">🔖</button></form>
           {% endif %}
         </div>
       </div>
-      <p class="font-amiri text-4xl leading-loose text-right text-white tracking-wide" dir="rtl" lang="ar">{{ v.text_uthmani }} ۝</p>
+      <p class="font-amiri text-3xl sm:text-4xl leading-loose text-right text-white tracking-wide" dir="rtl" lang="ar">{{ v.text_uthmani }} ۝</p>
       {% if show_translit and v.words %}<p class="text-[#c9a84c]/70 italic text-sm mt-2">{% for w in v.words %}{{ w.transliteration.text }} {% endfor %}</p>{% endif %}
       {% if v.translations %}
       <div class="h-px bg-[#c9a84c]/25 my-3"></div>

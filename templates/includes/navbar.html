@@ -1,8 +1,8 @@
-﻿<nav class="fixed top-0 w-full z-50 transition-all duration-500" id="navbar" x-data="{scrolled:false}" @scroll.window="scrolled = window.scrollY > 40" :class="scrolled ? 'bg-[#0d1117]/95 backdrop-blur-xl border-b border-[#c9a84c]/20' : 'bg-transparent'">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+<nav class="fixed top-0 w-full z-50 transition-all duration-500" id="main-nav" x-data="{scrolled:false}" @scroll.window="scrolled = window.scrollY > 40" :class="scrolled ? 'bg-[#0d1117]/95 backdrop-blur-xl border-b border-[#c9a84c]/20' : 'bg-transparent'">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
     <a href="/" class="flex items-center gap-3">
       <svg class="w-8 h-8 text-[#c9a84c] moon-spin" viewBox="0 0 24 24" fill="currentColor"><path d="M21 14.2A9 9 0 1 1 9.8 3a7 7 0 1 0 11.2 11.2Z"/></svg>
-      <span class="font-cinzel text-2xl font-bold nur-gold-text">NurCoran</span>
+      <span class="font-cinzel text-xl sm:text-2xl font-bold nur-gold-text">NurCoran</span>
     </a>
 
     <div class="hidden lg:flex items-center gap-6 text-sm">
@@ -13,14 +13,31 @@
       <a class="text-gray-300 hover:text-[#c9a84c]" href="/community/">Communaute</a>
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="hidden sm:flex items-center gap-2">
       {% if user.is_authenticated %}
         <a href="/dashboard/" class="h-10 w-10 rounded-full bg-[#c9a84c] text-[#080c10] flex items-center justify-center font-bold">{{ user.username|default:user.email|first|upper }}</a>
       {% else %}
-        <a href="/accounts/login/" class="px-5 py-2 rounded-full border border-[#c9a84c]/50 text-[#c9a84c] hover:bg-[#c9a84c]/10">Connexion</a>
-        <a href="/accounts/signup/" class="px-5 py-2 rounded-full font-bold text-[#080c10]" style="background: var(--nur-gold-gradient);">S'inscrire</a>
+        <a href="/accounts/login/" class="px-4 py-2 rounded-full border border-[#c9a84c]/50 text-[#c9a84c] hover:bg-[#c9a84c]/10">Connexion</a>
+        <a href="/accounts/signup/" class="px-4 py-2 rounded-full font-bold text-[#080c10]" style="background: var(--nur-gold-gradient);">S'inscrire</a>
       {% endif %}
     </div>
+
+    <button id="hamburger" type="button" class="lg:hidden h-10 w-10 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c] flex items-center justify-center" onclick="toggleMobileMenu()" aria-label="Ouvrir le menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="mobile-menu lg:hidden px-6">
+    <a class="text-gray-200 hover:text-[#c9a84c]" href="/quran/" onclick="toggleMobileMenu()">Coran</a>
+    <a class="text-gray-200 hover:text-[#c9a84c]" href="/prayer-times/" onclick="toggleMobileMenu()">Prieres</a>
+    <a class="text-gray-200 hover:text-[#c9a84c]" href="/azkar/" onclick="toggleMobileMenu()">Azkar</a>
+    <a class="text-gray-200 hover:text-[#c9a84c]" href="/tasbih/" onclick="toggleMobileMenu()">Tasbih</a>
+    <a class="text-gray-200 hover:text-[#c9a84c]" href="/community/" onclick="toggleMobileMenu()">Communaute</a>
+    {% if user.is_authenticated %}
+      <a href="/dashboard/" class="mt-2 px-5 py-2 rounded-full bg-[#c9a84c] text-[#080c10] font-bold" onclick="toggleMobileMenu()">Mon compte</a>
+    {% else %}
+      <a href="/accounts/login/" class="mt-2 px-5 py-2 rounded-full border border-[#c9a84c]/50 text-[#c9a84c]" onclick="toggleMobileMenu()">Connexion</a>
+      <a href="/accounts/signup/" class="px-5 py-2 rounded-full font-bold text-[#080c10]" style="background: var(--nur-gold-gradient);" onclick="toggleMobileMenu()">S'inscrire</a>
+    {% endif %}
   </div>
 </nav>
-

@@ -20,6 +20,8 @@ html { scroll-behavior: smooth; }
 body { font-family: 'Inter', sans-serif; }
 .font-cinzel { font-family: 'Cinzel', serif; }
 .font-amiri { font-family: 'Amiri', serif; }
+img, video, iframe { max-width: 100%; height: auto; }
+p, h1, h2, h3, h4, h5, h6, a, span { overflow-wrap: anywhere; }
 
 .nur-gold-text {
   background: var(--nur-gold-gradient);
@@ -71,3 +73,11 @@ body { font-family: 'Inter', sans-serif; }
 
 .toast { animation: toastIn .35s ease; }
 @keyframes toastIn { from {transform:translateX(120%); opacity:0;} to {transform:translateX(0); opacity:1;} }
+
+@media (max-width: 640px) {
+  .mobile-menu {
+    justify-content: flex-start;
+    padding-top: 96px;
+    gap: 16px;
+  }
+}

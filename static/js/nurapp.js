@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function toggleMobileMenu() {
   const menu = document.getElementById('mobile-menu');
   const hamburger = document.getElementById('hamburger');
+  if (!menu) return;
   menu?.classList.toggle('open');
   hamburger?.classList.toggle('active');
   document.body.style.overflow = menu?.classList.contains('open') ? 'hidden' : '';
@@ -32,6 +33,15 @@ const fadeObserver = new IntersectionObserver((entries) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+});
+
+window.addEventListener('resize', () => {
+  const menu = document.getElementById('mobile-menu');
+  if (!menu || window.innerWidth >= 1024) {
+    document.body.style.overflow = '';
+    menu?.classList.remove('open');
+    document.getElementById('hamburger')?.classList.remove('active');
+  }
 });
 
 // Tasbih pulse animation
