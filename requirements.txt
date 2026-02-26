@@ -1,9 +1,8 @@
-﻿django==4.2
+django==4.2
 django-allauth==0.57.0
 stripe==7.0.0
 python-decouple==3.8
 Pillow==10.0.0
-psycopg2-binary==2.9.7
 whitenoise==6.6.0
 gunicorn==21.2.0
 requests==2.31.0
