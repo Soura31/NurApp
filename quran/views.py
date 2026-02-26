@@ -101,17 +101,14 @@ class SurahDetailView(TemplateView):
         cache.set(cache_key, chapter, 86400)
         return chapter
 
-    def _get_verses(self, surah_number: int, selected_translation: str, selected_reciter: str):
-        cache_key = f"quran_verses_{surah_number}_{selected_translation}_{selected_reciter}"
+    def _get_verses(self, surah_number: int, selected_reciter: str):
+        cache_key = f"quran_verses_arabic_{surah_number}_{selected_reciter}"
         verses = cache.get(cache_key)
         if verses:
             return verses
         response = requests.get(
             f"{settings.QURAN_API_BASE}/verses/by_chapter/{surah_number}",
             params={
-                "language": "fr",
-                "words": "true",
-                "translations": selected_translation,
                 "audio": selected_reciter,
                 "per_page": 300,
             },
@@ -128,15 +125,9 @@ class SurahDetailView(TemplateView):
         user = self.request.user
         is_premium = user.is_authenticated and hasattr(user, "userprofile") and user.userprofile.is_premium
 
-        translations = self._get_translations(is_premium)
         reciters = self._get_reciters(is_premium)
 
-        selected_translation = self.request.GET.get("translation", FREE_TRANSLATIONS["fr"])
         selected_reciter = self.request.GET.get("reciter", "7")
-        show_translit = self.request.GET.get("translit", "1") == "1"
-
-        if not is_premium and selected_translation not in FREE_TRANSLATIONS.values():
-            selected_translation = FREE_TRANSLATIONS["fr"]
         if not is_premium and selected_reciter not in FREE_RECITERS:
             selected_reciter = "7"
 
@@ -144,7 +135,7 @@ class SurahDetailView(TemplateView):
         verses = []
         try:
             chapter = self._get_chapter(surah_number)
-            verses = self._get_verses(surah_number, selected_translation, selected_reciter)
+            verses = self._get_verses(surah_number, selected_reciter)
         except Exception:
             messages.error(self.request, "Erreur lors du chargement de la sourate.")
 
@@ -152,12 +143,75 @@ class SurahDetailView(TemplateView):
             {
                 "chapter": chapter,
                 "verses": verses,
-                "translations": translations,
                 "reciters": reciters,
-                "selected_translation": selected_translation,
                 "selected_reciter": selected_reciter,
-                "show_translit": show_translit,
                 "is_premium": is_premium,
+            }
+        )
+        return context
+
+
+class QuranPageView(TemplateView):
+    template_name = "quran/page.html"
+
+    def _get_reciters(self, is_premium: bool):
+        if not is_premium:
+            return [{"id": k, "reciter_name": v} for k, v in FREE_RECITERS.items()]
+        cache_key = "quran_reciters"
+        reciters = cache.get(cache_key)
+        if reciters:
+            return reciters
+        try:
+            response = requests.get(f"{settings.QURAN_API_BASE}/resources/recitations", timeout=10)
+            response.raise_for_status()
+            reciters = response.json().get("recitations", [])
+            cache.set(cache_key, reciters, 86400)
+            return reciters
+        except Exception:
+            return [{"id": k, "reciter_name": v} for k, v in FREE_RECITERS.items()]
+
+    def _get_page_verses(self, page_number: int, selected_reciter: str):
+        cache_key = f"quran_page_arabic_{page_number}_{selected_reciter}"
+        verses = cache.get(cache_key)
+        if verses:
+            return verses
+        response = requests.get(
+            f"{settings.QURAN_API_BASE}/verses/by_page/{page_number}",
+            params={"audio": selected_reciter, "per_page": 50},
+            timeout=12,
+        )
+        response.raise_for_status()
+        verses = response.json().get("verses", [])
+        cache.set(cache_key, verses, 21600)
+        return verses
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page_number = int(self.kwargs["page"])
+        if page_number < 1 or page_number > 604:
+            raise Http404
+
+        user = self.request.user
+        is_premium = user.is_authenticated and hasattr(user, "userprofile") and user.userprofile.is_premium
+        reciters = self._get_reciters(is_premium)
+        selected_reciter = self.request.GET.get("reciter", "7")
+        if not is_premium and selected_reciter not in FREE_RECITERS:
+            selected_reciter = "7"
+
+        verses = []
+        try:
+            verses = self._get_page_verses(page_number, selected_reciter)
+        except Exception:
+            messages.error(self.request, "Erreur lors du chargement de la page du Coran.")
+
+        context.update(
+            {
+                "page_number": page_number,
+                "verses": verses,
+                "reciters": reciters,
+                "selected_reciter": selected_reciter,
+                "prev_page": page_number - 1 if page_number > 1 else None,
+                "next_page": page_number + 1 if page_number < 604 else None,
             }
         )
         return context

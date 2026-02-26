@@ -4,7 +4,18 @@
 <section class="max-w-md mx-auto px-4 py-12" data-aos="zoom-in">
   <div class="bg-[#161b22] border border-[#c9a84c]/20 rounded-2xl p-6 shadow-2xl">
     <h1 class="font-cinzel text-3xl text-white mb-4">Connexion</h1>
-    <form method="post" class="space-y-4">{% csrf_token %}{{ form.as_p }}
+    <form method="post" class="space-y-4">{% csrf_token %}
+      {% for field in form %}
+        {% if field.name != 'remember' %}
+          <div>
+            <label class="block text-sm text-[#8b949e] mb-1">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <p class="text-red-400 text-sm mt-1">{{ field.errors|striptags }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
       <button class="w-full py-3 rounded-xl text-[#080c10] font-bold" style="background:var(--nur-gold-gradient)">Se connecter</button>
     </form>
   </div>
