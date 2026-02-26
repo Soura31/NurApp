@@ -192,6 +192,18 @@ class QuranPageView(TemplateView):
         cache.set(cache_key, verses, 21600)
         return verses
 
+    def _get_chapters_map(self):
+        cache_key = "quran_chapters_map"
+        chapter_map = cache.get(cache_key)
+        if chapter_map:
+            return chapter_map
+        response = requests.get(f"{settings.QURAN_API_BASE}/chapters", timeout=10)
+        response.raise_for_status()
+        chapters = response.json().get("chapters", [])
+        chapter_map = {c.get("id"): c.get("name_arabic", "") for c in chapters}
+        cache.set(cache_key, chapter_map, 86400)
+        return chapter_map
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         page_number = int(self.kwargs["page"])
@@ -206,8 +218,13 @@ class QuranPageView(TemplateView):
             selected_reciter = "7"
 
         verses = []
+        chapter_map = {}
         try:
             verses = self._get_page_verses(page_number, selected_reciter)
+            chapter_map = self._get_chapters_map()
+            for verse in verses:
+                chapter_id = verse.get("chapter_id")
+                verse["chapter_name_arabic"] = chapter_map.get(chapter_id, "")
         except Exception:
             messages.error(self.request, "Erreur lors du chargement de la page du Coran.")
 
