@@ -182,6 +182,13 @@ class QuranPageView(TemplateView):
         )
         response.raise_for_status()
         verses = response.json().get("verses", [])
+        for verse in verses:
+            verse_key = verse.get("verse_key", "")
+            if verse_key and ":" in verse_key and not verse.get("chapter_id"):
+                try:
+                    verse["chapter_id"] = int(verse_key.split(":")[0])
+                except Exception:
+                    verse["chapter_id"] = None
         cache.set(cache_key, verses, 21600)
         return verses
 

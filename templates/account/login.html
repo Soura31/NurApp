@@ -6,7 +6,7 @@
     <h1 class="font-cinzel text-3xl text-white mb-4">Connexion</h1>
     <form method="post" class="space-y-4">{% csrf_token %}
       {% for field in form %}
-        {% if field.name != 'remember' %}
+        {% if 'remember' not in field.name %}
           <div>
             <label class="block text-sm text-[#8b949e] mb-1">{{ field.label }}</label>
             {{ field }}

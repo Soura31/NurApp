@@ -2,30 +2,36 @@
 {% block title %}Page {{ page_number }} - Coran{% endblock %}
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8" data-aos="fade-up">
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <h1 class="font-cinzel text-2xl sm:text-3xl text-white">Lecture Par Page</h1>
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <h1 class="font-cinzel text-2xl sm:text-3xl text-white">Mushaf - Lecture Par Page</h1>
     <span class="px-4 py-2 rounded-full bg-[#161b22] border border-[#c9a84c]/30 text-[#c9a84c]">Page {{ page_number }} / 604</span>
   </div>
 
-  <div class="sticky top-16 z-40 bg-[#0d1117]/95 backdrop-blur-xl border-b border-[#c9a84c]/10 mt-6 p-3 rounded-xl">
+  <div class="sticky top-16 z-40 bg-[#0d1117]/95 backdrop-blur-xl border-b border-[#c9a84c]/10 p-3 rounded-xl">
     <form method="get" class="flex flex-wrap items-center gap-3">
       <select name="reciter" class="w-full sm:w-auto rounded-lg bg-[#161b22] border border-[#c9a84c]/20 px-3 py-2 text-sm text-white">{% for r in reciters %}<option value="{{ r.id }}" {% if r.id|stringformat:'s' == selected_reciter|stringformat:'s' %}selected{% endif %}>{{ r.reciter_name }}</option>{% endfor %}</select>
       <button class="px-4 py-2 rounded-full text-[#080c10] font-bold" style="background:var(--nur-gold-gradient)">Appliquer</button>
     </form>
   </div>
 
-  <div class="mt-6 space-y-4">
+  <div class="mt-6 rounded-2xl p-4 sm:p-8" style="background:#f8f2df;border:1px solid rgba(201,168,76,.45);box-shadow:0 8px 40px rgba(0,0,0,.28)">
     {% for v in verses %}
-    <article class="rounded-2xl p-6" style="background:rgba(201,168,76,.02);border:1px solid rgba(201,168,76,.08)">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <span class="h-9 w-9 rounded-lg bg-[#c9a84c]/20 text-[#f0c060] flex items-center justify-center">{{ v.verse_number }}</span>
-        <audio controls preload="none" class="h-8 w-full sm:w-auto">{% if v.audio.url %}<source src="{{ v.audio.url }}">{% endif %}</audio>
-      </div>
-      <p class="font-amiri text-3xl sm:text-4xl leading-loose text-right text-white tracking-wide" dir="rtl" lang="ar">{{ v.text_uthmani }} ۝</p>
-    </article>
+      {% ifchanged v.chapter_id %}
+      <p class="font-amiri text-2xl sm:text-3xl text-center text-[#5c4312] mb-3 mt-2" dir="rtl" lang="ar">سورة {{ v.chapter_id }}</p>
+      {% endifchanged %}
+      <p class="font-amiri text-2xl sm:text-[2.1rem] leading-[2.5] text-right text-[#181102] tracking-wide" dir="rtl" lang="ar" style="word-spacing:.22rem">{{ v.text_uthmani }} ﴿{{ v.verse_number }}﴾</p>
     {% empty %}
     <p class="text-[#8b949e]">Impossible de charger la page pour le moment.</p>
     {% endfor %}
+  </div>
+
+  <div class="mt-6 rounded-xl p-3 bg-[#0d1117]/70 border border-[#c9a84c]/20">
+    <form action="/quran/pages/1/" method="get" onsubmit="this.action='/quran/pages/' + this.page_number.value + '/';" class="flex flex-wrap items-center gap-3">
+      <label class="text-sm text-[#8b949e]">Aller a la page</label>
+      <input type="number" name="page_number" min="1" max="604" value="{{ page_number }}" class="w-28 rounded-lg bg-[#161b22] border border-[#c9a84c]/20 px-3 py-2 text-sm text-white">
+      <input type="hidden" name="reciter" value="{{ selected_reciter }}">
+      <button class="px-4 py-2 rounded-full text-[#080c10] font-bold" style="background:var(--nur-gold-gradient)">Ouvrir</button>
+    </form>
   </div>
 
   <div class="mt-8 flex items-center justify-between gap-3">
