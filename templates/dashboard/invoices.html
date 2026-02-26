@@ -1,0 +1,15 @@
+﻿{% extends 'dashboard/base.html' %}
+{% load currency %}
+{% block title %}Factures{% endblock %}
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-6">Factures</h1>
+<table class="w-full text-sm"><thead><tr class="border-b border-white/10"><th class="text-left">Date</th><th class="text-left">Montant</th><th class="text-left">Statut</th><th class="text-left">ID Stripe</th></tr></thead>
+<tbody>
+{% for i in invoices %}
+<tr class="border-b border-white/5"><td class="py-2">{{ i.created_at|date:'d/m/Y' }}</td><td>{{ i.amount|fcfa }}</td><td>{{ i.status }}</td><td>{{ i.stripe_payment_id }}</td></tr>
+{% empty %}
+<tr><td colspan="4" class="py-3">Aucune facture.</td></tr>
+{% endfor %}
+</tbody></table>
+{% endblock %}
+

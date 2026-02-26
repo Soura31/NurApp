@@ -1,0 +1,48 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NurCoran — application islamique premium">
+  <title>{% block title %}NurCoran{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/nurapp.css' %}">
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-[var(--nur-bg-deep)] text-[var(--nur-text-main)]" data-authenticated="{% if user.is_authenticated %}1{% endif %}">
+  <div id="page-loader" class="fixed inset-0 z-[100] bg-[var(--nur-bg-deep)] flex items-center justify-center">
+    <div class="star-loader"></div>
+  </div>
+
+  {% include 'includes/navbar.html' %}
+
+  <main class="pt-24 min-h-screen relative z-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'includes/footer.html' %}
+
+  <div class="fixed top-4 right-4 z-50 space-y-2" id="toast-container"></div>
+  {% if messages %}
+  <div class="hidden" id="django-messages">
+    {% for message in messages %}<span data-level="{{ message.tags|default:'info' }}">{{ message }}</span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <script src="{% static 'js/nurapp.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script>AOS.init({duration:800, once:true});</script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
+

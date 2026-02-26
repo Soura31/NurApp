@@ -1,0 +1,42 @@
+﻿{% extends 'dashboard/base.html' %}
+{% load currency %}
+{% block title %}Mon abonnement{% endblock %}
+{% block dashboard_content %}
+<h1 class="heading-xl mb-6">Mon abonnement</h1>
+<div class="glass-static p-6 fade-up">
+  <div class="flex items-center gap-4 mb-4">
+    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[rgba(212,175,55,0.1)]">
+      <i data-lucide="crown" class="w-6 h-6 text-gold"></i>
+    </div>
+    <div>
+      <p class="text-sm text-muted">Plan actuel</p>
+      <p class="text-xl font-bold text-gold">{{ profile.plan.name|default:'Free' }}</p>
+    </div>
+  </div>
+  <div class="grid sm:grid-cols-2 gap-3 text-sm mb-4">
+    <div class="flex items-center gap-2">
+      <i data-lucide="activity" class="w-4 h-4 text-muted"></i>
+      <span class="text-muted">Statut :</span>
+      <span class="badge badge-emerald">{{ profile.subscription_status }}</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <i data-lucide="calendar" class="w-4 h-4 text-muted"></i>
+      <span class="text-muted">Fin :</span>
+      <span>{{ profile.subscription_end_date|default:'-' }}</span>
+    </div>
+  </div>
+  <form method="post" action="{% url 'subscriptions:portal' %}">{% csrf_token %}
+    <button class="btn-gold"><i data-lucide="external-link" class="w-4 h-4"></i> Gérer via Stripe</button>
+  </form>
+</div>
+
+<h2 class="heading-lg mt-8 mb-4">Plans disponibles</h2>
+<div class="grid md:grid-cols-3 gap-4">
+  {% for plan in plans %}
+  <div class="glass card-glow p-5 fade-up">
+    <p class="font-bold text-white">{{ plan.name }}</p>
+    <p class="text-gold font-semibold mt-1">{{ plan.price_monthly|fcfa }}/mois</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

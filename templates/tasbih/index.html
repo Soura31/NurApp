@@ -1,0 +1,49 @@
+﻿{% extends 'base.html' %}
+{% block title %}Tasbih{% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 sm:px-6 py-10 text-center" data-aos="fade-up" x-data="{
+  presets: [
+    { text: 'SubhanAllah', arabic: 'سُبْحَانَ ٱللَّٰهِ', target: 33 },
+    { text: 'Alhamdulillah', arabic: 'ٱلْحَمْدُ لِلَّٰهِ', target: 33 },
+    { text: 'AllahuAkbar', arabic: 'اللَّهُ أَكْبَر', target: 33 }
+  ],
+  selectedText: 'SubhanAllah',
+  selectedArabic: 'سُبْحَانَ ٱللَّٰهِ',
+  count: 0,
+  target: 33,
+  get dashArray() { return 2 * Math.PI * 102; },
+  get dashOffset() {
+    const progress = Math.min(1, this.count / Math.max(1, this.target));
+    return this.dashArray * (1 - progress);
+  },
+  selectPreset(p) { this.selectedText = p.text; this.selectedArabic = p.arabic; this.target = p.target; this.count = 0; },
+  increment() { this.count += 1; },
+  reset() { this.count = 0; }
+}">
+  <h1 class="font-cinzel text-4xl text-white">Chapelet Numerique</h1>
+  <div class="flex justify-center gap-2 flex-wrap mt-5">
+    <template x-for="p in presets" :key="p.text"><button @click="selectPreset(p)" class="px-4 py-2 rounded-full border border-[#c9a84c]/30 text-[#c9a84c]" x-text="`${p.text} (${p.target})`"></button></template>
+  </div>
+  <p class="font-amiri text-5xl text-[#c9a84c] mt-8" dir="rtl" lang="ar" x-text="selectedArabic"></p>
+
+  <div class="relative w-72 h-72 mx-auto mt-8">
+    <svg class="absolute inset-0 w-full h-full -rotate-90"><circle cx="50%" cy="50%" r="45%" stroke="rgba(201,168,76,.2)" stroke-width="8" fill="none"></circle><circle cx="50%" cy="50%" r="45%" stroke="#c9a84c" stroke-width="8" fill="none" :stroke-dasharray="dashArray" :stroke-dashoffset="dashOffset"></circle></svg>
+    <button @click="increment()" class="w-full h-full rounded-full select-none active:scale-95 transition-all" style="background:radial-gradient(circle,#1a6b4a,#0d1117);border:3px solid #c9a84c;box-shadow:0 0 60px rgba(201,168,76,.2), inset 0 0 30px rgba(201,168,76,.05)">
+      <p class="text-6xl font-black text-white" x-text="count"></p><p class="text-[#8b949e]">Appuyez</p>
+    </button>
+  </div>
+
+  <p class="mt-4 text-[#f0c060]" x-text="`${count} / ${target}`"></p>
+  <div class="mt-4 flex flex-wrap justify-center gap-2">
+    <button @click="reset()" class="px-4 py-2 rounded-xl border border-[#c9a84c]/40 text-[#c9a84c]">Reinitialiser</button>
+    <form method="post" action="/tasbih/save/" class="inline-flex gap-2">{% csrf_token %}<input type="hidden" name="dhikr_text" :value="selectedText"><input type="hidden" name="count" :value="count"><input type="hidden" name="target" :value="target"><button class="px-4 py-2 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Sauvegarder</button></form>
+  </div>
+
+  <div class="mt-10 text-left">
+    <h2 class="font-cinzel text-2xl text-white mb-3">Historique sessions</h2>
+    <div class="grid md:grid-cols-2 gap-3">
+      {% for h in history %}<div class="rounded-xl p-4 bg-[#161b22] border border-[#c9a84c]/20"><p class="text-white">{{ h.dhikr_text }}</p><p class="text-[#8b949e] text-sm">{{ h.count }}/{{ h.target }} • {{ h.created_at|date:'d/m H:i' }}</p></div>{% empty %}<p class="text-[#8b949e]">Aucune session sauvegardee.</p>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

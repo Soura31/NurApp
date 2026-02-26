@@ -1,0 +1,15 @@
+﻿{% extends 'base.html' %}
+{% block title %}Archive Hadith{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Archive complete</h1>
+<form class="mb-4"><input name="q" value="{{ request.GET.q }}" placeholder="Recherche" class="bg-[#111827] rounded px-3 py-2 border border-white/10"><button class="ml-2 px-3 py-2 bg-gold text-black rounded">Filtrer</button></form>
+<div class="space-y-3">
+  {% for h in hadiths %}
+  <article class="p-4 rounded bg-[#0f1923] border border-white/10">
+    <p class="text-sm text-gold">{{ h.display_date }}</p>
+    <p>{{ h.text_french|truncatechars:250 }}</p>
+    <p class="text-xs text-gray-300">{{ h.source }} - {{ h.reference }}</p>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

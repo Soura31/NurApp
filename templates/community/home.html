@@ -1,0 +1,44 @@
+﻿{% extends 'base.html' %}
+{% block title %}Communauté{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-8 fade-up">
+  <div>
+    <h1 class="heading-xl">Forum communauté</h1>
+    <p class="text-muted mt-1">Partagez et échangez avec la communauté NurCoran</p>
+  </div>
+</div>
+
+<div class="glass-static p-6 mb-8 fade-up">
+  <form method="post" action="{% url 'community:post_create' %}" class="space-y-4">
+    {% csrf_token %}
+    <div class="flex items-center gap-2 mb-2">
+      <i data-lucide="pen-square" class="w-5 h-5 text-gold"></i>
+      <h2 class="font-bold text-white">Nouveau message</h2>
+    </div>
+    <select name="category" class="input-nur">
+      {% for c in categories %}<option value="{{ c.id }}">{{ c.name }} {% if c.is_premium %}✨ Premium{% endif %}
+      </option>{% endfor %}
+    </select>
+    <input name="title" placeholder="Titre de votre message" class="input-nur">
+    <textarea name="content" rows="4" placeholder="Partagez vos pensées..." class="input-nur"></textarea>
+    <button class="btn-gold"><i data-lucide="send" class="w-4 h-4"></i> Publier</button>
+  </form>
+</div>
+
+<h2 class="heading-lg mb-4">Catégories</h2>
+<div class="grid md:grid-cols-2 gap-4">
+  {% for c in categories %}
+  <a href="{% url 'community:category_posts' c.slug %}" class="glass card-glow p-5 block fade-up">
+    <div class="flex items-center gap-3">
+      <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[rgba(212,175,55,0.1)]">
+        <i data-lucide="message-circle" class="w-5 h-5 text-gold"></i>
+      </div>
+      <div>
+        <p class="font-bold text-white">{{ c.name }}</p>
+        <p class="text-sm text-muted mt-0.5">{{ c.description }}</p>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

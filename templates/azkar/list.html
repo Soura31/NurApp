@@ -1,0 +1,34 @@
+﻿{% extends 'base.html' %}
+{% block title %}Azkar{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
+  <h1 class="font-cinzel text-4xl text-white">Invocations & Azkar</h1>
+
+  {% if categories %}
+  <div class="flex gap-2 overflow-auto mt-6 pb-2">
+    {% for c in categories %}<a href="/azkar/{{ c.slug }}/" class="px-4 py-2 rounded-full bg-[#161b22] border border-[#c9a84c]/20 text-[#c9a84c] whitespace-nowrap">{{ c.name }}</a>{% endfor %}
+  </div>
+  {% endif %}
+
+  {% if category %}
+  <h2 class="text-2xl text-[#f0c060] mt-8">{{ category.name }}</h2>
+  <div class="space-y-4 mt-4">
+    {% for z in azkar %}
+    <article class="rounded-2xl p-6" style="border-left:3px solid #c9a84c;background:rgba(201,168,76,.03)">
+      <p class="font-amiri text-3xl text-right text-white" dir="rtl" lang="ar">{{ z.text_arabic }}</p>
+      {% if z.transliteration %}<p class="text-[#c9a84c]/70 italic mt-2">{{ z.transliteration }}</p>{% endif %}
+      {% if z.translation %}<p class="text-[#e6edf3] mt-2">{{ z.translation }}</p>{% endif %}
+      <div class="mt-4 flex flex-wrap items-center gap-3">
+        <span class="text-sm text-[#8b949e]">Repeter {{ z.repetitions }} fois</span>
+        {% if user.is_authenticated %}
+        <form method="post" action="/azkar/counter/{{ z.id }}/" class="inline">{% csrf_token %}<input type="hidden" name="increment" value="1"><button class="px-4 py-2 rounded-full border border-[#c9a84c]/40 text-[#c9a84c]">+1</button></form>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-[#8b949e] mt-6">Selectionnez une categorie pour voir les invocations.</p>
+  {% endif %}
+</section>
+{% endblock %}

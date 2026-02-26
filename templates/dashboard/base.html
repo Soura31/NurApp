@@ -1,0 +1,39 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+<div class="grid lg:grid-cols-5 gap-6">
+  <!-- Sidebar -->
+  <aside class="lg:col-span-1">
+    <div class="glass-static p-4 sticky top-28">
+      <h2 class="text-gold font-bold text-sm uppercase tracking-wider mb-4 px-2">Dashboard</h2>
+      <nav class="space-y-1">
+        <a class="sidebar-link" href="{% url 'dashboard:home' %}">
+          <i data-lucide="home" class="w-4 h-4"></i> Accueil
+        </a>
+        <a class="sidebar-link" href="{% url 'dashboard:subscription' %}">
+          <i data-lucide="crown" class="w-4 h-4"></i> Mon abonnement
+        </a>
+        <a class="sidebar-link" href="{% url 'dashboard:favorites' %}">
+          <i data-lucide="heart" class="w-4 h-4"></i> Mes favoris
+        </a>
+        <a class="sidebar-link" href="{% url 'dashboard:bookmarks' %}">
+          <i data-lucide="bookmark" class="w-4 h-4"></i> Mes signets
+        </a>
+        <a class="sidebar-link" href="{% url 'dashboard:invoices' %}">
+          <i data-lucide="receipt" class="w-4 h-4"></i> Factures
+        </a>
+        <a class="sidebar-link" href="{% url 'dashboard:profile' %}">
+          <i data-lucide="user" class="w-4 h-4"></i> Profil
+        </a>
+        <div class="divider-gold"></div>
+        <a class="sidebar-link" href="/admin-panel/">
+          <i data-lucide="shield" class="w-4 h-4"></i> Admin Panel
+        </a>
+      </nav>
+    </div>
+  </aside>
+  <!-- Content -->
+  <section class="lg:col-span-4">
+    {% block dashboard_content %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+﻿{% extends 'base.html' %}
+{% load currency %}
+{% block title %}Admin Panel{% endblock %}
+{% block content %}
+<h1 class="heading-xl mb-8">Admin Dashboard</h1>
+
+<div class="grid md:grid-cols-3 gap-5 mb-8">
+  <div class="glass stat-card card-glow p-6 fade-up">
+    <div class="stat-icon"><i data-lucide="trending-up" class="w-10 h-10 text-gold"></i></div>
+    <p class="stat-label mb-2">MRR</p>
+    <p class="stat-value">{{ mrr|fcfa }}</p>
+  </div>
+  <div class="glass stat-card card-glow p-6 fade-up" style="transition-delay:0.1s">
+    <div class="stat-icon"><i data-lucide="users" class="w-10 h-10 text-gold"></i></div>
+    <p class="stat-label mb-2">Utilisateurs actifs</p>
+    <p class="stat-value">{{ active_users }}</p>
+  </div>
+  <div class="glass stat-card card-glow p-6 fade-up" style="transition-delay:0.2s">
+    <div class="stat-icon"><i data-lucide="scroll-text" class="w-10 h-10 text-gold"></i></div>
+    <p class="stat-label mb-2">Hadiths</p>
+    <p class="stat-value">{{ hadith_count }}</p>
+  </div>
+</div>
+
+<div class="glass-static p-5 mb-8 fade-up">
+  <canvas id="revenueChart" height="200"></canvas>
+</div>
+
+<h2 class="heading-lg mb-4">Modération forum</h2>
+<div class="space-y-2 mb-8 fade-up">
+  {% for p in reported_posts %}
+  <div class="glass p-4 border-l-4" style="border-left-color:#ef4444">
+    <div class="flex items-center gap-2">
+      <i data-lucide="alert-triangle" class="w-4 h-4 text-red-400"></i>
+      <span class="font-semibold">{{ p.title }}</span>
+      <span class="text-muted text-sm">— {{ p.author.username }}</span>
+    </div>
+  </div>
+  {% empty %}
+  <div class="glass-static p-4 text-muted flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald"></i> Aucun signalement.
+  </div>
+  {% endfor %}
+</div>
+
+<h2 class="heading-lg mb-4">Abonnés par plan</h2>
+<div class="grid md:grid-cols-3 gap-4 fade-up">
+  {% for s in subscribers_by_plan %}
+  <div class="glass card-glow p-5">
+    <p class="text-sm text-muted">{{ s.name }}</p>
+    <p class="stat-value text-xl">{{ s.total }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('revenueChart');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['S1', 'S2', 'S3', 'S4'],
+      datasets: [{
+        label: 'Revenus',
+        data: [120000, 250000, 300000, {{ mrr|default: 0
+      }}],
+    borderColor: '#d4af37',
+    backgroundColor: 'rgba(212,175,55,0.1)',
+    fill: true,
+    tension: 0.4,
+    pointBackgroundColor: '#d4af37',
+    pointBorderColor: '#d4af37'
+  }]
+  },
+    options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#8899aa' } } },
+    scales: {
+      x: { ticks: { color: '#8899aa' }, grid: { color: 'rgba(255,255,255,0.03)' } },
+      y: { ticks: { color: '#8899aa' }, grid: { color: 'rgba(255,255,255,0.03)' } }
+    }
+  }
+});
+</script>
+{% endblock %}

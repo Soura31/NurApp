@@ -1,0 +1,18 @@
+﻿{% extends 'base.html' %}
+{% block title %}Hadith du jour{% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 sm:px-6 py-12" data-aos="fade-up">
+  <h1 class="font-cinzel text-4xl text-center nur-gold-text mb-8">Hadith du jour</h1>
+  {% if hadith %}
+  <article class="max-w-3xl mx-auto rounded-3xl p-10" style="background:linear-gradient(135deg,#161b22,#1c2330);border:1px solid rgba(201,168,76,.2);box-shadow:0 0 80px rgba(201,168,76,.08)">
+    <p class="font-amiri text-3xl text-right text-white" dir="rtl" lang="ar">{{ hadith.text_arabic }}</p>
+    <div class="h-px bg-[#c9a84c]/40 my-5"></div>
+    <p class="text-[#e6edf3] text-lg">{{ hadith.text_french }}</p>
+    <p class="text-[#8b949e] text-sm mt-4">Rapporte par {{ hadith.narrator }} — {{ hadith.source }} {{ hadith.reference }}</p>
+    <div class="mt-5 flex gap-2"><button class="px-3 py-2 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]">🔗 Partager</button><button class="px-3 py-2 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]">📋 Copier</button></div>
+  </article>
+  {% else %}
+  <p class="text-center text-[#8b949e]">Aucun hadith disponible.</p>
+  {% endif %}
+</section>
+{% endblock %}

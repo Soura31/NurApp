@@ -1,0 +1,18 @@
+﻿{% extends 'base.html' %}
+{% block title %}99 Noms d'Allah{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
+  <h1 class="font-amiri text-6xl text-[#c9a84c] text-center" dir="rtl" lang="ar">أَسْمَاءُ اللَّهِ الْحُسْنَى</h1>
+  <p class="text-center text-[#8b949e]">Les plus beaux noms d'Allah</p>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8">
+    {% for n in names %}
+      <article class="group rounded-2xl p-5 text-center premium-lift" style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(26,107,74,.08));border:1px solid rgba(201,168,76,.2)">
+        <p class="text-[#c9a84c]/60 text-xs">{{ n.number }}</p>
+        <p class="font-amiri text-3xl text-white" dir="rtl" lang="ar">{{ n.name_arabic }}</p>
+        <p class="text-[#c9a84c]">{{ n.transliteration }}</p>
+        <p class="text-[#8b949e] text-sm">{{ n.meaning }}</p>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

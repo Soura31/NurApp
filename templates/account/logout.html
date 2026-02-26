@@ -1,0 +1,10 @@
+﻿{% extends 'base.html' %}
+{% block title %}Deconnexion{% endblock %}
+{% block content %}
+<section class="max-w-md mx-auto px-4 py-12" data-aos="zoom-in">
+  <div class="bg-[#161b22] border border-[#c9a84c]/20 rounded-2xl p-6 shadow-2xl text-center">
+    <h1 class="font-cinzel text-3xl text-white mb-4">Deconnexion</h1>
+    <form method="post">{% csrf_token %}<button class="px-6 py-3 rounded-xl text-[#080c10] font-bold" style="background:var(--nur-gold-gradient)">Confirmer</button></form>
+  </div>
+</section>
+{% endblock %}

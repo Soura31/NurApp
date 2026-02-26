@@ -1,0 +1,22 @@
+﻿{% extends 'dashboard/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block dashboard_content %}
+<h1 class="heading-xl mb-8">Tableau de bord</h1>
+<div class="grid md:grid-cols-3 gap-5">
+  <div class="glass stat-card card-glow p-6 fade-up">
+    <div class="stat-icon"><i data-lucide="book-open" class="w-10 h-10 text-gold"></i></div>
+    <p class="stat-label mb-2">Versets lus</p>
+    <p class="stat-value">{{ stats.versets_lus }}</p>
+  </div>
+  <div class="glass stat-card card-glow p-6 fade-up" style="transition-delay:0.1s">
+    <div class="stat-icon"><i data-lucide="moon" class="w-10 h-10 text-gold"></i></div>
+    <p class="stat-label mb-2">Prières suivies</p>
+    <p class="stat-value">{{ stats.prieres_suivies }}</p>
+  </div>
+  <div class="glass stat-card card-glow p-6 fade-up" style="transition-delay:0.2s">
+    <div class="stat-icon"><i data-lucide="circle-dot" class="w-10 h-10 text-gold"></i></div>
+    <p class="stat-label mb-2">Tasbih total</p>
+    <p class="stat-value">{{ stats.tasbih_total }}</p>
+  </div>
+</div>
+{% endblock %}

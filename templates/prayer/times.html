@@ -1,0 +1,36 @@
+﻿{% extends 'base.html' %}
+{% block title %}Horaires de Prieres{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
+  <h1 class="font-cinzel text-4xl text-white">Horaires de Prieres</h1>
+  <p class="text-[#8b949e] mt-2">{{ city }}, {{ country }}</p>
+
+  <div class="rounded-3xl p-8 text-center mt-6" style="background:linear-gradient(135deg,#1a6b4a,#2d9b6f);box-shadow:0 0 60px rgba(26,107,74,.3)">
+    <p class="text-white/70">Prochaine priere</p>
+    <p id="next-prayer-name" class="font-cinzel text-5xl text-white font-black">Fajr</p>
+    <p id="next-prayer-time" class="text-[#f0c060] text-4xl">--:--</p>
+    <p id="countdown" class="text-white text-2xl font-mono">00:00:00</p>
+  </div>
+
+  <div class="grid md:grid-cols-5 gap-4 mt-6" id="prayer-cards">
+    {% for name, time in timings.items %}
+    <div class="rounded-xl p-4 border border-[#c9a84c]/20 bg-[#161b22] text-center prayer-card" data-name="{{ name }}" data-time="{{ time }}">
+      <p class="text-[#e6edf3] font-semibold">{{ name }}</p>
+      <p class="text-[#f0c060] text-2xl">{{ time }}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-8 bg-[#161b22] border border-[#c9a84c]/20 rounded-2xl p-5 overflow-x-auto">
+    <h2 class="font-cinzel text-2xl text-white mb-3">Calendrier mensuel</h2>
+    <table class="w-full text-sm min-w-[720px]">
+      <thead class="text-[#c9a84c]"><tr><th class="text-left py-2">Date</th><th>Fajr</th><th>Dhuhr</th><th>Asr</th><th>Maghrib</th><th>Isha</th></tr></thead>
+      <tbody class="text-[#8b949e]">
+        {% for d in monthly_calendar|slice:':12' %}
+        <tr class="border-t border-white/5"><td class="py-2">{{ d.date.gregorian.date }}</td><td class="text-center">{{ d.timings.Fajr|slice:':5' }}</td><td class="text-center">{{ d.timings.Dhuhr|slice:':5' }}</td><td class="text-center">{{ d.timings.Asr|slice:':5' }}</td><td class="text-center">{{ d.timings.Maghrib|slice:':5' }}</td><td class="text-center">{{ d.timings.Isha|slice:':5' }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

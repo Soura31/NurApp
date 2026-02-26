@@ -1,0 +1,29 @@
+﻿{% extends 'base.html' %}
+{% block title %}Al-Quran Al-Karim{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
+  <h1 class="font-cinzel text-4xl text-white">Al-Quran Al-Karim</h1>
+  <p class="font-amiri text-3xl text-[#c9a84c] mt-2" dir="rtl" lang="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+  <form class="mt-5 grid md:grid-cols-[1fr,auto,auto] gap-3" method="get">
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher une sourate" class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white">
+    <select name="revelation_place" class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white">
+      <option value="">Toutes</option>
+      <option value="makkah" {% if revelation_place == 'makkah' %}selected{% endif %}>Mecquoises</option>
+      <option value="madinah" {% if revelation_place == 'madinah' %}selected{% endif %}>Medinoises</option>
+    </select>
+    <button class="px-5 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Filtrer</button>
+  </form>
+
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+    {% for c in chapters %}
+    <a href="/quran/{{ c.id }}/" class="group rounded-xl p-4 premium-lift" style="background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.1)">
+      <div class="h-10 w-10 rounded-lg bg-[#c9a84c]/20 text-[#f0c060] flex items-center justify-center font-bold">{{ c.id }}</div>
+      <p class="font-amiri text-2xl text-white text-right mt-3" dir="rtl" lang="ar">{{ c.name_arabic }}</p>
+      <p class="text-[#e6edf3] text-sm">{{ c.translated_name.name }}</p>
+      <p class="text-[#c9a84c]/70 text-xs">{{ c.name_simple }}</p>
+      <p class="text-[#8b949e] text-xs mt-1">{{ c.verses_count }} versets • {{ c.revelation_place|title }}</p>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

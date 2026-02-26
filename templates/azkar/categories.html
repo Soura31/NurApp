@@ -1,0 +1,10 @@
+﻿{% extends 'base.html' %}
+{% block title %}Categories Azkar{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Invocations</h1>
+<div class="grid md:grid-cols-3 gap-4">
+  {% for c in categories %}
+  <a href="{% url 'azkar:list' c.slug %}" class="block p-5 rounded-xl bg-[#0f1923] border border-white/10 hover:border-gold/50">{{ c.name }}</a>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+﻿{% extends 'base.html' %}
+{% block title %}{{ category.name }}{% endblock %}
+{% block content %}
+<div class="mb-6 fade-up">
+  <h1 class="heading-xl">{{ category.name }}</h1>
+  <a href="/community/" class="text-sm text-muted hover:text-gold inline-flex items-center gap-1 mt-2">
+    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Retour au forum
+  </a>
+</div>
+<div class="space-y-3">
+  {% for p in posts %}
+  <a href="{% url 'community:post_detail' p.id %}" class="glass card-glow p-5 block fade-up">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="font-semibold text-white">{{ p.title }}</p>
+        <p class="text-sm text-muted mt-1">
+          <i data-lucide="user" class="w-3 h-3 inline"></i> {{ p.author.username }}
+          {% if p.author.userprofile.is_premium %}<span class="badge badge-gold ml-1">Premium</span>{% endif %}
+        </p>
+      </div>
+      <span class="text-xs text-muted">{{ p.created_at|date:'d/m H:i' }}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="glass-static p-5 text-muted text-center"><i data-lucide="message-circle"
+      class="w-5 h-5 inline mb-1"></i><br>Aucun post disponible.</div>
+  {% endfor %}
+</div>
+{% endblock %}

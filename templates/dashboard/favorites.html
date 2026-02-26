@@ -1,0 +1,6 @@
+﻿{% extends 'dashboard/base.html' %}
+{% block title %}Mes favoris{% endblock %}
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-6">Mes favoris</h1>
+<div class="space-y-2">{% for f in favorites %}<div class="p-3 rounded bg-[#0f1923] border border-white/10">Sourate {{ f.surah_number }} - Verset {{ f.ayah_number }}</div>{% empty %}<p>Aucun favori.</p>{% endfor %}</div>
+{% endblock %}

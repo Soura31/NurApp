@@ -1,0 +1,11 @@
+﻿{% extends 'base.html' %}
+{% block title %}{{ asma.transliteration }}{% endblock %}
+{% block content %}
+<article class="max-w-3xl mx-auto p-8 rounded-2xl bg-[#0f1923] border border-gold/30">
+  <p class="text-sm text-gold">Nom {{ asma.number }}</p>
+  <h1 class="font-amiri text-6xl mt-2" dir="rtl">{{ asma.name_arabic }}</h1>
+  <h2 class="text-2xl font-bold mt-3">{{ asma.transliteration }}</h2>
+  <p class="text-emerald mt-1">{{ asma.meaning }}</p>
+  <p class="mt-6 leading-relaxed">{{ asma.explanation }}</p>
+</article>
+{% endblock %}

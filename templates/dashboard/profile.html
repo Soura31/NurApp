@@ -1,0 +1,10 @@
+﻿{% extends 'dashboard/base.html' %}
+{% block title %}Profil{% endblock %}
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-6">Profil</h1>
+<form method="post" enctype="multipart/form-data" class="p-6 rounded-xl bg-[#0f1923] border border-white/10 space-y-3">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="bg-gold text-black px-4 py-2 rounded">Mettre a jour</button>
+</form>
+{% endblock %}
