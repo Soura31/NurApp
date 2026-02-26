@@ -1,38 +1,46 @@
 {% extends 'base.html' %}
-{% block title %}Page {{ page_number }} - Coran{% endblock %}
+{% block title %}الصفحة {{ page_number }}{% endblock %}
+{% block extra_head %}
+<style>
+  #main-nav, footer { display: none !important; }
+  main { padding-top: 0 !important; }
+</style>
+{% endblock %}
 {% block content %}
-<section class="max-w-3xl mx-auto px-3 sm:px-4 py-6" data-aos="fade-up">
-  <div class="flex items-center justify-between text-[#7da491] mb-4 text-sm">
-    <a href="{% if prev_page %}/quran/pages/{{ prev_page }}/{% else %}#{% endif %}?reciter={{ selected_reciter }}" class="{% if not prev_page %}pointer-events-none opacity-40{% endif %}">السابق</a>
-    <span class="text-[#6e8f7f]">الصفحة {{ page_number }}</span>
-    <a href="{% if next_page %}/quran/pages/{{ next_page }}/{% else %}#{% endif %}?reciter={{ selected_reciter }}" class="{% if not next_page %}pointer-events-none opacity-40{% endif %}">التالي</a>
-  </div>
+<section class="min-h-screen bg-[#f7f7f7]">
+  <div class="mx-auto max-w-md px-4 py-6">
+    <div class="flex items-center justify-between text-[#5d8b79] text-sm mb-4" dir="rtl">
+      <a href="{% if next_page %}/quran/pages/{{ next_page }}/{% else %}#{% endif %}?reciter={{ selected_reciter }}" class="{% if not next_page %}pointer-events-none opacity-40{% endif %}">التالي</a>
+      <span>الصفحة {{ page_number }}</span>
+      <a href="{% if prev_page %}/quran/pages/{{ prev_page }}/{% else %}#{% endif %}?reciter={{ selected_reciter }}" class="{% if not prev_page %}pointer-events-none opacity-40{% endif %}">السابق</a>
+    </div>
 
-  <div class="bg-[#fdfcf8] rounded-[22px] border border-[#dce8df] shadow-[0_8px_30px_rgba(0,0,0,.10)] px-4 sm:px-8 py-6 sm:py-10">
-    <form method="get" class="mb-6 flex items-center justify-center gap-2">
-      <select name="reciter" class="rounded-full bg-[#eef6f0] border border-[#cddfd3] px-3 py-2 text-xs sm:text-sm text-[#255f4c]">{% for r in reciters %}<option value="{{ r.id }}" {% if r.id|stringformat:'s' == selected_reciter|stringformat:'s' %}selected{% endif %}>{{ r.reciter_name }}</option>{% endfor %}</select>
-      <button class="px-4 py-2 rounded-full bg-[#dceee2] border border-[#c1dccd] text-[#255f4c] text-xs sm:text-sm">تطبيق</button>
-    </form>
+    <div class="rounded-3xl bg-white border border-[#dfe7e2] px-4 py-6 shadow-[0_10px_24px_rgba(0,0,0,.08)]">
+      <form method="get" class="mb-5 flex items-center justify-center gap-2">
+        <select name="reciter" class="rounded-full border border-[#c8dad0] bg-[#eef6f0] px-3 py-2 text-xs text-[#215f4b]">{% for r in reciters %}<option value="{{ r.id }}" {% if r.id|stringformat:'s' == selected_reciter|stringformat:'s' %}selected{% endif %}>{{ r.reciter_name }}</option>{% endfor %}</select>
+        <button class="rounded-full border border-[#c3daca] bg-[#dceddf] px-3 py-2 text-xs text-[#215f4b]">تطبيق</button>
+      </form>
 
-    {% for v in verses %}
-      {% ifchanged v.chapter_id %}
-      <div class="mx-auto w-fit mb-4 mt-2 px-5 py-1 rounded-full border border-[#b8d4c1] bg-[#eef6f0]">
-        <p class="font-amiri text-2xl sm:text-3xl text-center text-[#2c6d57]" dir="rtl" lang="ar">{{ v.chapter_name_arabic }}</p>
-      </div>
-      {% endifchanged %}
-      <p class="font-amiri text-[2rem] sm:text-[2.4rem] leading-[2.45] text-center text-[#1f1f1f]" dir="rtl" lang="ar">{{ v.text_uthmani }} <span class="inline-flex items-center justify-center min-w-8 h-8 px-1 rounded-full border border-[#a7c8b5] text-[#2f725c] text-[0.95rem] align-middle">{{ v.verse_number }}</span></p>
-    {% empty %}
-    <p class="text-[#8b949e] text-center">Impossible de charger la page pour le moment.</p>
-    {% endfor %}
-  </div>
+      {% for v in verses %}
+        {% ifchanged v.chapter_id %}
+        <div class="mx-auto mb-5 mt-2 w-fit rounded-full border border-[#c8ddd1] bg-[#eef6f0] px-5 py-1">
+          <p class="font-amiri text-3xl text-[#1f6b54]" dir="rtl">{{ v.chapter_name_arabic }}</p>
+        </div>
+        {% endifchanged %}
+        <p class="font-amiri text-[2rem] leading-[2.2] text-[#222] text-center" dir="rtl">{{ v.text_uthmani }} <span class="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#aacbb8] px-1 text-[0.95rem] text-[#2a7159]">{{ v.verse_number }}</span></p>
+      {% empty %}
+        <p class="text-center text-[#8b949e]">تعذر تحميل الصفحة حاليا</p>
+      {% endfor %}
+    </div>
 
-  <div class="mt-5 rounded-xl p-3 bg-[#edf6f1] border border-[#d2e4da]">
-    <form action="/quran/pages/1/" method="get" onsubmit="this.action='/quran/pages/' + this.page_number.value + '/';" class="flex flex-wrap items-center justify-center gap-3">
-      <label class="text-sm text-[#4c7f6c]">اذهب الى الصفحة</label>
-      <input type="number" name="page_number" min="1" max="604" value="{{ page_number }}" class="w-28 rounded-full bg-white border border-[#c8ded1] px-3 py-2 text-sm text-[#255f4c]">
-      <input type="hidden" name="reciter" value="{{ selected_reciter }}">
-      <button class="px-4 py-2 rounded-full bg-[#dceee2] border border-[#c1dccd] text-[#255f4c] text-sm">فتح</button>
-    </form>
+    <div class="mt-5 rounded-2xl border border-[#d2e3d9] bg-[#edf6f1] p-3">
+      <form action="/quran/pages/1/" method="get" onsubmit="this.action='/quran/pages/' + this.page_number.value + '/';" class="flex items-center justify-center gap-2">
+        <button class="rounded-full border border-[#c3daca] bg-[#dceddf] px-3 py-2 text-xs text-[#215f4b]">اذهب</button>
+        <input type="number" name="page_number" min="1" max="604" value="{{ page_number }}" class="w-24 rounded-full border border-[#c8ded1] bg-white px-3 py-2 text-center text-[#215f4b]">
+        <label class="text-sm text-[#487b68]">الصفحة</label>
+        <input type="hidden" name="reciter" value="{{ selected_reciter }}">
+      </form>
+    </div>
   </div>
 </section>
 {% endblock %}
