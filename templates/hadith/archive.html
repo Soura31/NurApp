@@ -1,15 +1,54 @@
-﻿{% extends 'base.html' %}
-{% block title %}Archive Hadith{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Tous les Hadiths{% endblock %}
 {% block content %}
-<h1 class="text-3xl font-bold mb-6">Archive complete</h1>
-<form class="mb-4"><input name="q" value="{{ request.GET.q }}" placeholder="Recherche" class="bg-[#111827] rounded px-3 py-2 border border-white/10"><button class="ml-2 px-3 py-2 bg-gold text-black rounded">Filtrer</button></form>
-<div class="space-y-3">
-  {% for h in hadiths %}
-  <article class="p-4 rounded bg-[#0f1923] border border-white/10">
-    <p class="text-sm text-gold">{{ h.display_date }}</p>
-    <p>{{ h.text_french|truncatechars:250 }}</p>
-    <p class="text-xs text-gray-300">{{ h.source }} - {{ h.reference }}</p>
-  </article>
-  {% endfor %}
-</div>
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="font-cinzel text-4xl text-white">Tous les Hadiths</h1>
+    <a href="{% url 'hadith:day' %}" class="px-4 py-2 rounded-xl border border-[#c9a84c]/40 text-[#c9a84c] hover:bg-[#c9a84c]/10 transition">
+      Hadith du jour
+    </a>
+  </div>
+  <p class="text-[#8b949e] mt-3">{{ total_hadiths }} hadith(s) disponibles.</p>
+
+  <form method="get" class="mt-5 grid md:grid-cols-[1fr,auto] gap-3">
+    <input
+      type="text"
+      name="q"
+      value="{{ q }}"
+      placeholder="Recherche: texte, source, narrateur..."
+      class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white"
+    >
+    <button class="px-5 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">
+      Rechercher
+    </button>
+  </form>
+
+  <div class="grid lg:grid-cols-2 gap-4 mt-8">
+    {% for h in hadiths %}
+    <article class="rounded-2xl p-5 border border-[#c9a84c]/20 bg-[#161b22]">
+      <p class="text-[#8b949e] text-xs">{{ h.display_date }}</p>
+      <p class="font-amiri text-2xl text-right text-[#f0f0e8] mt-2" dir="rtl" lang="ar">{{ h.text_arabic }}</p>
+      <div class="h-px bg-[#c9a84c]/25 my-3"></div>
+      <p class="text-[#e6edf3] leading-relaxed">{{ h.text_french }}</p>
+      <p class="text-[#8b949e] text-xs mt-3">{{ h.narrator }} - {{ h.source }} {{ h.reference }}</p>
+    </article>
+    {% empty %}
+    <p class="text-[#8b949e]">Aucun hadith trouve.</p>
+    {% endfor %}
+  </div>
+
+  {% if is_paginated %}
+  <div class="mt-8 flex items-center justify-center gap-2 text-sm">
+    {% if page_obj.has_previous %}
+    <a href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]">Precedent</a>
+    {% endif %}
+    <span class="px-3 py-2 rounded-lg bg-[#161b22] border border-[#c9a84c]/20 text-[#e6edf3]">
+      Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+    </span>
+    {% if page_obj.has_next %}
+    <a href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]">Suivant</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
 {% endblock %}

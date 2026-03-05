@@ -1,49 +1,220 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% block title %}Tasbih{% endblock %}
-{% block content %}
-<section class="max-w-5xl mx-auto px-4 sm:px-6 py-10 text-center" data-aos="fade-up" x-data="{
-  presets: [
-    { text: 'SubhanAllah', arabic: 'سُبْحَانَ ٱللَّٰهِ', target: 33 },
-    { text: 'Alhamdulillah', arabic: 'ٱلْحَمْدُ لِلَّٰهِ', target: 33 },
-    { text: 'AllahuAkbar', arabic: 'اللَّهُ أَكْبَر', target: 33 }
-  ],
-  selectedText: 'SubhanAllah',
-  selectedArabic: 'سُبْحَانَ ٱللَّٰهِ',
-  count: 0,
-  target: 33,
-  get dashArray() { return 2 * Math.PI * 102; },
-  get dashOffset() {
-    const progress = Math.min(1, this.count / Math.max(1, this.target));
-    return this.dashArray * (1 - progress);
-  },
-  selectPreset(p) { this.selectedText = p.text; this.selectedArabic = p.arabic; this.target = p.target; this.count = 0; },
-  increment() { this.count += 1; },
-  reset() { this.count = 0; }
-}">
-  <h1 class="font-cinzel text-4xl text-white">Chapelet Numerique</h1>
-  <div class="flex justify-center gap-2 flex-wrap mt-5">
-    <template x-for="p in presets" :key="p.text"><button @click="selectPreset(p)" class="px-4 py-2 rounded-full border border-[#c9a84c]/30 text-[#c9a84c]" x-text="`${p.text} (${p.target})`"></button></template>
-  </div>
-  <p class="font-amiri text-5xl text-[#c9a84c] mt-8" dir="rtl" lang="ar" x-text="selectedArabic"></p>
 
-  <div class="relative w-72 h-72 mx-auto mt-8">
-    <svg class="absolute inset-0 w-full h-full -rotate-90"><circle cx="50%" cy="50%" r="45%" stroke="rgba(201,168,76,.2)" stroke-width="8" fill="none"></circle><circle cx="50%" cy="50%" r="45%" stroke="#c9a84c" stroke-width="8" fill="none" :stroke-dasharray="dashArray" :stroke-dashoffset="dashOffset"></circle></svg>
-    <button @click="increment()" class="w-full h-full rounded-full select-none active:scale-95 transition-all" style="background:radial-gradient(circle,#1a6b4a,#0d1117);border:3px solid #c9a84c;box-shadow:0 0 60px rgba(201,168,76,.2), inset 0 0 30px rgba(201,168,76,.05)">
-      <p class="text-6xl font-black text-white" x-text="count"></p><p class="text-[#8b949e]">Appuyez</p>
+{% block content %}
+<div class="min-h-screen bg-[#080c10] flex flex-col items-center justify-center px-4">
+  <h1 class="text-white font-cinzel text-3xl font-bold mb-6">Chapelet Numerique</h1>
+
+  <div class="flex gap-4 mb-6 flex-wrap justify-center">
+    {% for dhikr in dhikr_list %}
+    <button class="dhikr-btn px-4 py-2 rounded-full text-sm border border-[#c9a84c]/30 text-[#c9a84c] hover:bg-[#c9a84c]/10 transition"
+            data-dhikr="{{ dhikr.name }}"
+            onclick="changeDhikr('{{ dhikr.name }}')">
+      {{ dhikr.name }}
+    </button>
+    {% endfor %}
+  </div>
+
+  <div class="flex gap-3 mb-6">
+    <button id="target-toggle-btn" type="button" class="target-btn px-4 py-2 rounded-full text-sm border border-[#c9a84c]/40 text-[#c9a84c] bg-[#c9a84c]/10 transition" onclick="toggleTarget()">
+      Objectif: 33
     </button>
   </div>
 
-  <p class="mt-4 text-[#f0c060]" x-text="`${count} / ${target}`"></p>
-  <div class="mt-4 flex flex-wrap justify-center gap-2">
-    <button @click="reset()" class="px-4 py-2 rounded-xl border border-[#c9a84c]/40 text-[#c9a84c]">Reinitialiser</button>
-    <form method="post" action="/tasbih/save/" class="inline-flex gap-2">{% csrf_token %}<input type="hidden" name="dhikr_text" :value="selectedText"><input type="hidden" name="count" :value="count"><input type="hidden" name="target" :value="target"><button class="px-4 py-2 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Sauvegarder</button></form>
+  <p id="arabic-text" class="font-amiri text-4xl text-[#c9a84c] mb-6" dir="rtl" lang="ar">سُبْحَانَ اللَّهِ</p>
+
+  <div class="relative w-64 h-64 mb-6">
+    <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 264 264">
+      <circle cx="132" cy="132" r="120" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="6"></circle>
+      <circle id="progress-circle" cx="132" cy="132" r="120" fill="none" stroke="#c9a84c" stroke-width="6" stroke-linecap="round" style="transition: stroke-dashoffset 0.3s ease;"></circle>
+    </svg>
+
+    <button id="tasbih-btn"
+            type="button"
+            onclick="incrementCount()"
+            class="absolute inset-4 rounded-full flex flex-col items-center justify-center transition-all duration-150 active:scale-95 select-none touch-none"
+            style="background: radial-gradient(circle, #1a6b4a, #0d1117); border: 2px solid rgba(201,168,76,0.3); box-shadow: 0 0 40px rgba(201,168,76,0.2), inset 0 0 20px rgba(201,168,76,0.05); cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;">
+      <span id="counter-display" class="text-white font-black" style="font-size: 4rem; line-height: 1">0</span>
+      <span class="text-gray-400 text-sm mt-1">Appuyez</span>
+    </button>
   </div>
 
-  <div class="mt-10 text-left">
+  <p id="counter-text" class="text-[#c9a84c] text-xl font-semibold mb-6">0 / 33</p>
+
+  <button id="reset-btn" type="button" class="px-6 py-2 rounded-full border border-[#c9a84c]/30 text-[#c9a84c] text-sm hover:bg-[#c9a84c]/10 transition">
+    <i class="fa-solid fa-rotate-left mr-2"></i>
+    Reinitialiser
+  </button>
+
+  <div class="mt-10 w-full max-w-2xl text-left">
     <h2 class="font-cinzel text-2xl text-white mb-3">Historique sessions</h2>
     <div class="grid md:grid-cols-2 gap-3">
-      {% for h in history %}<div class="rounded-xl p-4 bg-[#161b22] border border-[#c9a84c]/20"><p class="text-white">{{ h.dhikr_text }}</p><p class="text-[#8b949e] text-sm">{{ h.count }}/{{ h.target }} • {{ h.created_at|date:'d/m H:i' }}</p></div>{% empty %}<p class="text-[#8b949e]">Aucune session sauvegardee.</p>{% endfor %}
+      {% for h in sessions %}
+      <div class="rounded-xl p-4 bg-[#161b22] border border-[#c9a84c]/20">
+        <p class="text-white">{{ h.dhikr_text }}</p>
+        <p class="text-[#8b949e] text-sm">{{ h.count }}/{{ h.target }} • {{ h.created_at|date:'d/m H:i' }}</p>
+      </div>
+      {% empty %}
+      <p class="text-[#8b949e]">Aucune session sauvegardee.</p>
+      {% endfor %}
     </div>
   </div>
-</section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let count = 0;
+let target = 33;
+let currentDhikr = 'SubhanAllah';
+let audioCtx = null;
+
+const DHIKR_LIST = [
+  { name: 'SubhanAllah', arabic: 'سُبْحَانَ اللَّهِ', target: 33 },
+  { name: 'Alhamdulillah', arabic: 'الْحَمْدُ لِلَّهِ', target: 33 },
+  { name: 'AllahuAkbar', arabic: 'اللَّهُ أَكْبَرُ', target: 33 },
+];
+
+function incrementCount() {
+  count++;
+  document.getElementById('counter-display').textContent = count;
+  document.getElementById('counter-text').textContent = count + ' / ' + target;
+  updateProgressCircle(count, target);
+
+  if (navigator.vibrate) navigator.vibrate(30);
+
+  const btn = document.getElementById('tasbih-btn');
+  btn.style.transform = 'scale(0.95)';
+  setTimeout(() => {
+    btn.style.transform = 'scale(1)';
+  }, 100);
+
+  if (count >= target) onTargetReached();
+}
+
+function ensureAudioContext() {
+  if (!audioCtx) {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) audioCtx = new Ctx();
+  }
+  return audioCtx;
+}
+
+function playTone(freq, durationMs, volume) {
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+  const oscillator = ctx.createOscillator();
+  const gain = ctx.createGain();
+  oscillator.type = 'sine';
+  oscillator.frequency.value = freq;
+  gain.gain.value = volume;
+  oscillator.connect(gain);
+  gain.connect(ctx.destination);
+  oscillator.start();
+  oscillator.stop(ctx.currentTime + (durationMs / 1000));
+}
+
+function updateProgressCircle(current, total) {
+  const circle = document.getElementById('progress-circle');
+  if (!circle) return;
+
+  const radius = circle.r ? circle.r.baseVal.value : 120;
+  const circumference = 2 * Math.PI * radius;
+  const progress = current / total;
+  const offset = circumference - (progress * circumference);
+
+  circle.style.strokeDasharray = circumference;
+  circle.style.strokeDashoffset = offset;
+}
+
+function onTargetReached() {
+  const btn = document.getElementById('tasbih-btn');
+  btn.style.background = 'linear-gradient(135deg, #c9a84c, #f0c060)';
+  playTone(880, 90, 0.05);
+
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+  if (target === 33) {
+    setTimeout(() => {
+      setTarget(99);
+      btn.style.background = '';
+    }, 600);
+    return;
+  }
+
+  saveSession(currentDhikr, count, target);
+
+  setTimeout(() => {
+    resetCount();
+    btn.style.background = '';
+  }, 1500);
+}
+
+function resetCount() {
+  count = 0;
+  document.getElementById('counter-display').textContent = '0';
+  document.getElementById('counter-text').textContent = '0 / ' + target;
+  updateProgressCircle(0, target);
+}
+
+function setTarget(newTarget) {
+  target = Number(newTarget) || 33;
+  const targetBtn = document.getElementById('target-toggle-btn');
+  if (targetBtn) targetBtn.textContent = 'Objectif: ' + target;
+  resetCount();
+}
+
+function toggleTarget() {
+  setTarget(target === 33 ? 99 : 33);
+}
+
+function changeDhikr(dhikrName) {
+  const dhikr = DHIKR_LIST.find(d => d.name === dhikrName);
+  if (!dhikr) return;
+
+  currentDhikr = dhikr.name;
+  const arabicEl = document.getElementById('arabic-text');
+  if (arabicEl) arabicEl.textContent = dhikr.arabic;
+
+  document.querySelectorAll('.dhikr-btn').forEach(btn => btn.classList.remove('bg-[#c9a84c]/10'));
+  document.querySelector(`[data-dhikr="${dhikrName}"]`)?.classList.add('bg-[#c9a84c]/10');
+
+  resetCount();
+}
+
+function saveSession(dhikrName, finalCount, finalTarget) {
+  fetch('/tasbih/save/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken'),
+    },
+    body: JSON.stringify({
+      dhikr: dhikrName,
+      count: finalCount,
+      target: finalTarget,
+    })
+  });
+}
+
+function getCookie(name) {
+  let value = null;
+  document.cookie.split(';').forEach(c => {
+    c = c.trim();
+    if (c.startsWith(name + '=')) value = decodeURIComponent(c.split('=')[1]);
+  });
+  return value;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTarget(33);
+  updateProgressCircle(0, target);
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'Space' || e.code === 'Enter') {
+    e.preventDefault();
+    incrementCount();
+  }
+});
+</script>
 {% endblock %}

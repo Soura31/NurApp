@@ -8,7 +8,7 @@
   <div class="absolute -right-10 top-24 w-96 h-96 rounded-full blur-3xl bg-[#2d9b6f]/10"></div>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-20 relative z-10 text-center" data-aos="fade-up">
     <p class="font-amiri text-2xl text-[#c9a84c]/80" dir="rtl" lang="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
-    <span class="inline-block mt-6 px-5 py-2 rounded-full border border-[#c9a84c]/40 bg-[#c9a84c]/10 text-[#f0c060] animate-pulse">🌙 Plus de 10 000 musulmans nous font confiance</span>
+    <span class="inline-block mt-6 px-5 py-2 rounded-full border border-[#c9a84c]/40 bg-[#c9a84c]/10 text-[#f0c060] animate-pulse">🌙 Plus de <span class="nur-stat-number text-2xl align-middle">10<span class="nur-stat-k">k</span></span> utilisateurs nous font confiance</span>
     <h1 class="font-cinzel text-4xl sm:text-5xl md:text-7xl font-black text-white mt-8">Nourrissez votre <span class="nur-gold-text">ame</span> chaque jour</h1>
     <p class="text-lg sm:text-xl text-[#8b949e] max-w-3xl mx-auto mt-6">Coran, prieres, invocations et bien plus pour votre vie spirituelle.</p>
     <div class="mt-10 flex flex-wrap justify-center gap-4">
@@ -17,10 +17,46 @@
     </div>
 
     <div class="grid md:grid-cols-4 gap-4 mt-14 text-sm">
-      <div><p class="text-[#f0c060] text-3xl font-black" data-counter="114">0</p><p class="text-[#8b949e]">Sourates</p></div>
-      <div><p class="text-[#f0c060] text-3xl font-black" data-counter="100">0</p><p class="text-[#8b949e]">Langues</p></div>
-      <div><p class="text-[#f0c060] text-3xl font-black" data-counter="50">0</p><p class="text-[#8b949e]">Recitateurs</p></div>
-      <div><p class="text-[#f0c060] text-3xl font-black" data-counter="5">0</p><p class="text-[#8b949e]">Prieres/jour</p></div>
+      <a href="/quran/" class="block rounded-xl p-2 hover:bg-[#c9a84c]/10 transition"><p class="nur-stat-number text-3xl" data-counter="114">0</p><p class="text-[#8b949e]">Sourates</p></a>
+      <a href="/quran/languages/" class="block rounded-xl p-2 hover:bg-[#c9a84c]/10 transition"><p class="nur-stat-number text-3xl" data-counter="100">0</p><p class="text-[#8b949e]">Langues</p></a>
+      <a href="/quran/reciters/" class="block rounded-xl p-2 hover:bg-[#c9a84c]/10 transition"><p class="nur-stat-number text-3xl" data-counter="50">0</p><p class="text-[#8b949e]">Recitateurs</p></a>
+      <a href="/subscriptions/plans/" class="block rounded-xl p-2 hover:bg-[#c9a84c]/10 transition"><p class="nur-stat-number text-3xl">10<span class="nur-stat-k">k</span></p><p class="text-[#8b949e]">Utilisateurs</p></a>
+    </div>
+  </div>
+</section>
+
+<section class="py-12 bg-[#080c10]" data-aos="fade-up">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <h2 class="font-cinzel text-3xl text-center nur-gold-text mb-8">Cotes Explorer</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <a href="/quran/" class="rounded-2xl p-5 border border-[#c9a84c]/20 bg-[#161b22] text-white hover:border-[#c9a84c]/60 hover:bg-[#1c2330] premium-lift transition">
+        <span class="h-12 w-12 rounded-full bg-[#c9a84c]/15 border border-[#c9a84c]/40 flex items-center justify-center text-[#f0c060] text-xl mb-3"><i class="fa-solid fa-book-quran"></i></span>
+        <p class="font-semibold">Coran</p>
+      </a>
+      <a href="/prayer-times/" class="rounded-2xl p-5 border border-[#c9a84c]/20 bg-[#161b22] text-white hover:border-[#c9a84c]/60 hover:bg-[#1c2330] premium-lift transition">
+        <span class="h-12 w-12 rounded-full bg-[#1a6b4a]/20 border border-[#2d9b6f]/40 flex items-center justify-center text-[#7ce3b6] text-xl mb-3"><i class="fa-solid fa-mosque"></i></span>
+        <p class="font-semibold">Prieres</p>
+      </a>
+      <a href="/hadith/" class="rounded-2xl p-5 border border-[#c9a84c]/20 bg-[#161b22] text-white hover:border-[#c9a84c]/60 hover:bg-[#1c2330] premium-lift transition">
+        <span class="h-12 w-12 rounded-full bg-[#c9a84c]/15 border border-[#c9a84c]/40 flex items-center justify-center text-[#f0c060] text-xl mb-3"><i class="fa-solid fa-scroll"></i></span>
+        <p class="font-semibold">Hadith</p>
+      </a>
+      <a href="/dashboard/" class="rounded-2xl p-5 border border-[#c9a84c]/20 bg-[#161b22] text-white hover:border-[#c9a84c]/60 hover:bg-[#1c2330] premium-lift transition">
+        <span class="h-12 w-12 rounded-full bg-[#1a6b4a]/20 border border-[#2d9b6f]/40 flex items-center justify-center text-[#7ce3b6] text-xl mb-3"><i class="fa-solid fa-user"></i></span>
+        <p class="font-semibold">Compte</p>
+      </a>
+      <a href="/accounts/login/" class="rounded-2xl p-5 border border-[#c9a84c]/20 bg-[#161b22] text-white hover:border-[#c9a84c]/60 hover:bg-[#1c2330] premium-lift transition">
+        <span class="h-12 w-12 rounded-full bg-[#c9a84c]/15 border border-[#c9a84c]/40 flex items-center justify-center text-[#f0c060] text-xl mb-3"><i class="fa-solid fa-right-to-bracket"></i></span>
+        <p class="font-semibold">Connexion</p>
+      </a>
+      <a href="/accounts/signup/" class="rounded-2xl p-5 border border-[#c9a84c]/20 bg-[#161b22] text-white hover:border-[#c9a84c]/60 hover:bg-[#1c2330] premium-lift transition">
+        <span class="h-12 w-12 rounded-full bg-[#1a6b4a]/20 border border-[#2d9b6f]/40 flex items-center justify-center text-[#7ce3b6] text-xl mb-3"><i class="fa-solid fa-user-plus"></i></span>
+        <p class="font-semibold">Inscription</p>
+      </a>
+      <a href="/dashboard/" class="rounded-2xl p-5 border border-[#c9a84c]/20 bg-[#161b22] text-white hover:border-[#c9a84c]/60 hover:bg-[#1c2330] premium-lift transition">
+        <span class="h-12 w-12 rounded-full bg-[#c9a84c]/15 border border-[#c9a84c]/40 flex items-center justify-center text-[#f0c060] text-xl mb-3"><i class="fa-solid fa-chart-line"></i></span>
+        <p class="font-semibold">Dashboard</p>
+      </a>
     </div>
   </div>
 </section>
@@ -30,11 +66,25 @@
     <h2 class="font-cinzel text-4xl text-center nur-gold-text mb-10">Tout pour votre vie spirituelle</h2>
     <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
       {% for feature in features %}
-      <article class="rounded-2xl p-6 nur-glass-card premium-lift">
-        <div class="h-12 w-12 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center text-[#f0c060] mb-4"><i class="fa-solid fa-star-and-crescent"></i></div>
-        <h3 class="text-xl font-semibold text-white">{{ feature }}</h3>
+      <a href="{{ feature.url }}" class="block rounded-2xl p-6 nur-glass-card premium-lift hover:bg-[#c9a84c]/10 transition">
+        <div class="h-12 w-12 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center text-[#f0c060] mb-4">
+          {% if feature.label == "Coran avec traductions multiplies" %}
+          <i class="fa-solid fa-book-quran"></i>
+          {% elif feature.label == "Horaires de priere geolocalises" %}
+          <i class="fa-solid fa-mosque"></i>
+          {% elif feature.label == "Audio recitateurs premium" %}
+          <i class="fa-solid fa-headphones"></i>
+          {% elif feature.label == "Azkar avec compteur intelligent" %}
+          <i class="fa-solid fa-hands-praying"></i>
+          {% elif feature.label == "Forum communaute modere" %}
+          <i class="fa-solid fa-users"></i>
+          {% else %}
+          <i class="fa-solid fa-chart-line"></i>
+          {% endif %}
+        </div>
+        <h3 class="text-xl font-semibold text-white">{{ feature.label }}</h3>
         <p class="text-[#8b949e] text-sm mt-2">Experience premium moderne et spirituelle.</p>
-      </article>
+      </a>
       {% endfor %}
     </div>
   </div>
@@ -67,8 +117,8 @@
       <article class="rounded-2xl p-6 relative {% if plan.is_popular %}border border-[#c9a84c]/50 shadow-[0_0_40px_rgba(201,168,76,.15)] bg-[#c9a84c]/5 scale-[1.02]{% else %}border border-white/10 bg-white/5{% endif %}">
         {% if plan.is_popular %}<span class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold text-[#080c10]" style="background:var(--nur-gold-gradient)">⭐ Populaire</span>{% endif %}
         <h3 class="font-cinzel text-2xl text-white">{{ plan.name }}</h3>
-        <p class="text-4xl font-black nur-gold-text mt-3">{{ plan.price_monthly|fcfa }}</p>
-        <p class="text-[#8b949e] text-sm">{{ plan.price_yearly|fcfa }}/an</p>
+        <p class="text-4xl font-black nur-price-value mt-3">{{ plan.price_monthly|fcfa }}</p>
+        <p class="text-[#8b949e] text-sm"><span class="nur-price-value">{{ plan.price_yearly|fcfa }}</span>/an</p>
         <a href="/subscriptions/plans/" class="mt-5 block text-center px-4 py-3 rounded-xl {% if plan.is_popular %}text-[#080c10]{% else %}text-[#c9a84c] border border-[#c9a84c]/40{% endif %}" style="{% if plan.is_popular %}background:var(--nur-gold-gradient){% endif %}">Choisir</a>
       </article>
       {% endfor %}
@@ -76,12 +126,12 @@
   </div>
 </section>
 
-<section class="py-16" style="background:linear-gradient(135deg,#1a6b4a,#2d9b6f)">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-white">
-    <div><p class="text-3xl sm:text-5xl font-black" data-counter="10000">0</p><p>Utilisateurs</p></div>
-    <div><p class="text-3xl sm:text-5xl font-black" data-counter="114">0</p><p>Sourates</p></div>
-    <div><p class="text-3xl sm:text-5xl font-black" data-counter="100">0</p><p>Langues</p></div>
-    <div><p class="text-3xl sm:text-5xl font-black" data-counter="50">0</p><p>Recitateurs</p></div>
+<section class="py-16" style="background:linear-gradient(135deg,var(--nur-bg-deep),var(--nur-bg-dark)); border-top:1px solid var(--nur-border); border-bottom:1px solid var(--nur-border)">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-center" style="color: var(--nur-text-main);">
+    <a href="/quran/" class="block rounded-xl p-2 transition" style="color: var(--nur-text-main);"><p class="nur-stat-number text-3xl sm:text-5xl" data-counter="114">0</p><p style="color: var(--nur-text-muted);">Sourates</p></a>
+    <a href="/quran/languages/" class="block rounded-xl p-2 transition" style="color: var(--nur-text-main);"><p class="nur-stat-number text-3xl sm:text-5xl" data-counter="100">0</p><p style="color: var(--nur-text-muted);">Langues</p></a>
+    <a href="/quran/reciters/" class="block rounded-xl p-2 transition" style="color: var(--nur-text-main);"><p class="nur-stat-number text-3xl sm:text-5xl" data-counter="50">0</p><p style="color: var(--nur-text-muted);">Recitateurs</p></a>
+    <a href="/subscriptions/plans/" class="block rounded-xl p-2 transition" style="color: var(--nur-text-main);"><p class="nur-stat-number text-3xl sm:text-5xl">10<span class="nur-stat-k">k</span></p><p style="color: var(--nur-text-muted);">Utilisateurs</p></a>
   </div>
 </section>
 

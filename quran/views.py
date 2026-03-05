@@ -3,13 +3,16 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.http import Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView
 import requests
+from pathlib import Path
+import re
 
 from users.mixins import PremiumRequiredMixin
 from .models import Bookmark, Favorite
+from .reciters_catalog import RECITERS_CATALOG
 
 FREE_TRANSLATIONS = {
     "fr": "20",  # Francais
@@ -17,6 +20,13 @@ FREE_TRANSLATIONS = {
     "ar": "203",  # Arabe simplifie
 }
 FREE_RECITERS = {"7": "Al-Afasy", "1": "Husary"}
+ARABIC_DIGITS_TRANS = str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩")
+
+
+def to_arabic_digits(value):
+    if value is None:
+        return ""
+    return str(value).translate(ARABIC_DIGITS_TRANS)
 
 
 class QuranListView(TemplateView):
@@ -49,106 +59,144 @@ class QuranListView(TemplateView):
             match_q = not q or q in str(chapter.get("id", "")).lower() or q in name_ar.lower() or q in name_fr.lower()
             match_place = not place or chapter.get("revelation_place", "").lower() == place
             if match_q and match_place:
+                chapter["id_ar"] = to_arabic_digits(chapter.get("id", ""))
+                chapter["verses_count_ar"] = to_arabic_digits(chapter.get("verses_count", ""))
                 filtered.append(chapter)
 
         context.update({"chapters": filtered, "q": q, "revelation_place": place})
         return context
 
 
-class SurahDetailView(TemplateView):
-    template_name = "quran/detail.html"
+class QuranRecitersView(TemplateView):
+    template_name = "quran/reciters.html"
 
-    def _get_translations(self, is_premium: bool):
-        if not is_premium:
-            return [{"id": v, "name": k.upper()} for k, v in FREE_TRANSLATIONS.items()]
-        cache_key = "quran_translations"
-        translations = cache.get(cache_key)
-        if translations:
-            return translations
-        try:
-            response = requests.get(f"{settings.QURAN_API_BASE}/resources/translations", timeout=10)
-            response.raise_for_status()
-            translations = response.json().get("translations", [])
-            cache.set(cache_key, translations, 86400)
-            return translations
-        except Exception:
-            return [{"id": v, "name": k.upper()} for k, v in FREE_TRANSLATIONS.items()]
-
-    def _get_reciters(self, is_premium: bool):
-        if not is_premium:
-            return [{"id": k, "reciter_name": v} for k, v in FREE_RECITERS.items()]
-        cache_key = "quran_reciters"
-        reciters = cache.get(cache_key)
-        if reciters:
-            return reciters
-        try:
-            response = requests.get(f"{settings.QURAN_API_BASE}/resources/recitations", timeout=10)
-            response.raise_for_status()
-            reciters = response.json().get("recitations", [])
-            cache.set(cache_key, reciters, 86400)
-            return reciters
-        except Exception:
-            return [{"id": k, "reciter_name": v} for k, v in FREE_RECITERS.items()]
-
-    def _get_chapter(self, surah_number: int):
-        cache_key = f"quran_chapter_{surah_number}"
-        chapter = cache.get(cache_key)
-        if chapter:
-            return chapter
-        response = requests.get(f"{settings.QURAN_API_BASE}/chapters/{surah_number}", timeout=10)
-        response.raise_for_status()
-        chapter = response.json().get("chapter", {})
-        cache.set(cache_key, chapter, 86400)
-        return chapter
-
-    def _get_verses(self, surah_number: int, selected_reciter: str):
-        cache_key = f"quran_verses_arabic_{surah_number}_{selected_reciter}"
-        verses = cache.get(cache_key)
-        if verses:
-            return verses
-        response = requests.get(
-            f"{settings.QURAN_API_BASE}/verses/by_chapter/{surah_number}",
-            params={
-                "audio": selected_reciter,
-                "per_page": 300,
-            },
-            timeout=12,
-        )
-        response.raise_for_status()
-        verses = response.json().get("verses", [])
-        cache.set(cache_key, verses, 21600)  # 6h
-        return verses
+    @staticmethod
+    def _slugify(value: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        surah_number = int(self.kwargs["number"])
-        user = self.request.user
-        is_premium = user.is_authenticated and hasattr(user, "userprofile") and user.userprofile.is_premium
-
-        reciters = self._get_reciters(is_premium)
-
-        selected_reciter = self.request.GET.get("reciter", "7")
-        if not is_premium and selected_reciter not in FREE_RECITERS:
-            selected_reciter = "7"
-
-        chapter = {}
-        verses = []
-        try:
-            chapter = self._get_chapter(surah_number)
-            verses = self._get_verses(surah_number, selected_reciter)
-        except Exception:
-            messages.error(self.request, "Erreur lors du chargement de la sourate.")
-
-        context.update(
-            {
-                "chapter": chapter,
-                "verses": verses,
-                "reciters": reciters,
-                "selected_reciter": selected_reciter,
-                "is_premium": is_premium,
-            }
-        )
+        avatars_dir = Path(settings.BASE_DIR) / "static" / "images" / "reciters"
+        reciters = []
+        for item in RECITERS_CATALOG:
+            slug = self._slugify(item["name"])
+            local_avatar = None
+            for ext in ("jpg", "jpeg", "png", "webp"):
+                candidate = avatars_dir / f"{slug}.{ext}"
+                if candidate.exists():
+                    local_avatar = f"/static/images/reciters/{slug}.{ext}"
+                    break
+            if not local_avatar:
+                local_avatar = "/static/images/reciters/placeholder.svg"
+            reciters.append(
+                {
+                    "name": item["name"],
+                    "country": item["country"],
+                    "avatar": local_avatar,
+                }
+            )
+        context["reciters"] = reciters
         return context
+
+
+class QuranLanguagesView(TemplateView):
+    template_name = "quran/languages.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["languages"] = [
+            "Arabe",
+            "Francais",
+            "Anglais",
+            "Espagnol",
+            "Allemand",
+            "Italien",
+            "Portugais",
+            "Turc",
+            "Ourdou",
+            "Persan",
+            "Malais",
+            "Indonesien",
+            "Bengali",
+            "Hindi",
+            "Russe",
+            "Swahili",
+            "Hausa",
+            "Tamoul",
+            "Chinois",
+            "Japonais",
+        ]
+        return context
+
+
+class SurahDetailView(View):
+    template_name = "quran/detail.html"
+
+    def get(self, request, surah_number: int):
+        surah_cache_key = f"surah_{surah_number}"
+        surah_data = cache.get(surah_cache_key)
+        if not surah_data:
+            try:
+                response = requests.get(f"{settings.QURAN_API_BASE}/chapters/{surah_number}", timeout=10)
+                response.raise_for_status()
+                surah_data = response.json().get("chapter", {})
+                cache.set(surah_cache_key, surah_data, 86400)
+            except Exception:
+                surah_data = {}
+
+        verses_cache_key = f"verses_{surah_number}_v2"
+        verses = cache.get(verses_cache_key)
+        if not verses:
+            try:
+                response = requests.get(
+                    f"{settings.QURAN_API_BASE}/verses/by_chapter/{surah_number}",
+                    params={
+                        "per_page": "300",
+                        "fields": "text_uthmani,verse_number,verse_key,juz_number,hizb_number,page_number",
+                        "translations": "136",
+                        "audio": "7",
+                    },
+                    timeout=15,
+                )
+                response.raise_for_status()
+                verses = response.json().get("verses", [])
+                if verses:
+                    cache.set(verses_cache_key, verses, 21600)
+            except Exception:
+                verses = []
+
+        if surah_number != 9 and verses:
+            first_text = (verses[0].get("text_uthmani") or "").strip()
+            if "بِسْمِ" in first_text:
+                verses = verses[1:]
+
+        first_verse = verses[0] if verses else {}
+        hizb = first_verse.get("hizb_number", "-")
+        juz = first_verse.get("juz_number", "-")
+        page_number = first_verse.get("page_number", "-")
+        for index, verse in enumerate(verses, start=1):
+            verse["verse_number_ar"] = to_arabic_digits(verse.get("verse_number", ""))
+            verse["display_number"] = index
+            verse["display_number_ar"] = to_arabic_digits(index)
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "surah": surah_data,
+                "chapter": surah_data,
+                "verses": verses,
+                "surah_number": surah_number,
+                "hizb": hizb,
+                "hizb_ar": to_arabic_digits(hizb),
+                "juz": juz,
+                "juz_ar": to_arabic_digits(juz),
+                "page_number": page_number,
+                "page_number_ar": to_arabic_digits(page_number),
+                "prev_surah": surah_number - 1 if surah_number > 1 else None,
+                "next_surah": surah_number + 1 if surah_number < 114 else None,
+            },
+        )
 
 
 class QuranPageView(TemplateView):

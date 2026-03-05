@@ -1,33 +1,270 @@
-﻿{% extends 'base.html' %}
-{% block title %}Sourate {{ chapter.id }}{% endblock %}
-{% block content %}
-<section class="max-w-7xl mx-auto px-4 sm:px-6 py-8" data-aos="fade-up">
-  <h1 class="font-amiri text-3xl sm:text-5xl text-white text-right" dir="rtl" lang="ar">{{ chapter.name_arabic }}</h1>
-  <p class="text-[#8b949e]">سورة {{ chapter.id }} • {{ chapter.verses_count }} ايات</p>
-  {% if chapter.id != 9 %}<p class="font-amiri text-3xl text-center text-[#c9a84c] mt-4" dir="rtl" lang="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>{% endif %}
+{% extends 'base.html' %}
+{% block title %}Sourate {{ surah_number }}{% endblock %}
 
-  <div class="sticky top-16 z-40 bg-[#0d1117]/95 backdrop-blur-xl border-b border-[#c9a84c]/10 mt-6 p-3 rounded-xl flex flex-wrap items-center gap-3">
-    <form method="get" class="flex flex-wrap items-center gap-3 w-full">
-      <select name="reciter" class="w-full sm:w-auto rounded-lg bg-[#161b22] border border-[#c9a84c]/20 px-3 py-2 text-sm text-white">{% for r in reciters %}<option value="{{ r.id }}" {% if r.id|stringformat:'s' == selected_reciter|stringformat:'s' %}selected{% endif %}>{{ r.reciter_name }}</option>{% endfor %}</select>
-      <button class="px-4 py-2 rounded-full text-[#080c10] font-bold" style="background:var(--nur-gold-gradient)">Appliquer</button>
-    </form>
+{% block extra_head %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:wght@400;700&display=swap');
+
+  .mushaf-page-wrapper {
+    background: var(--surah-page-bg, #080c10) !important;
+    min-height: 100vh;
+    padding-bottom: 6rem;
+  }
+
+  .mushaf-text {
+    font-family: 'Amiri Quran', 'Amiri', serif;
+    font-size: 1.65rem;
+    line-height: 3.4rem;
+    text-align: justify;
+    direction: rtl;
+    color: var(--surah-mode-main, #c9a84c);
+    padding: 0 1.25rem;
+  }
+
+  .ayah-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 2.2rem;
+    height: 2.2rem;
+    margin: 0 0.2rem;
+    vertical-align: middle;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+  }
+
+  .ayah-number:hover { transform: scale(1.15); }
+  .ayah-number:active { transform: scale(0.9); }
+
+  .ayah-number svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ayah-number span {
+    position: relative;
+    z-index: 1;
+    font-size: 0.65rem;
+    color: var(--surah-mode-text, #c9a84c);
+    font-family: 'Amiri', serif;
+    font-weight: bold;
+  }
+
+  .ayah-active {
+    background: rgba(201,168,76,0.12);
+    border-radius: 6px;
+    padding: 2px 6px;
+    transition: background 0.3s ease;
+  }
+
+  .bismillah-text {
+    font-family: 'Amiri Quran', serif;
+    font-size: 1.8rem;
+    color: var(--surah-mode-text, #c9a84c);
+    text-align: center;
+    direction: rtl;
+    text-shadow: 0 0 30px rgba(201,168,76,0.3);
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    margin-bottom: 1.5rem;
+  }
+
+  .page-number-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c9a84c, #f0c060);
+    color: #080c10;
+    font-family: 'Amiri', serif;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+  }
+
+  .mushaf-page-wrapper a,
+  .mushaf-page-wrapper p,
+  .mushaf-page-wrapper span,
+  .mushaf-page-wrapper div {
+    color: inherit;
+  }
+
+  .surah-sticky-header {
+    background: var(--surah-header-bg, rgba(8,12,16,0.95));
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .surah-sub-label {
+    color: var(--surah-sub-label, #6b7280);
+  }
+
+  html[data-theme="dark"] .mushaf-page-wrapper,
+  body.theme-dark .mushaf-page-wrapper {
+    --surah-mode-text: #c9a84c;
+    --surah-mode-main: #c9a84c;
+    --surah-page-bg: #080c10;
+    --surah-header-bg: rgba(8,12,16,0.95);
+    --surah-sub-label: #6b7280;
+  }
+
+  html[data-theme="light"] .mushaf-page-wrapper,
+  body.theme-light .mushaf-page-wrapper {
+    --surah-mode-text: #000000;
+    --surah-mode-main: #000000;
+    --surah-page-bg: #f8fafc;
+    --surah-header-bg: rgba(248,250,252,0.95);
+    --surah-sub-label: #64748b;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mushaf-page-wrapper">
+  <div class="sticky top-0 z-50 px-4 py-3 surah-sticky-header">
+    <div class="flex items-center justify-between" dir="rtl">
+      <div class="text-right">
+        <span class="block text-base font-bold" style="font-family: 'Amiri', serif; color: var(--surah-mode-text, #c9a84c)">{{ hizb_ar }}</span>
+        <span class="block text-xs surah-sub-label">حزب</span>
+      </div>
+
+      <div class="px-6 py-1 rounded-lg" style="border: 1px solid rgba(201,168,76,0.5); background: rgba(201,168,76,0.08)">
+        <span class="text-lg font-bold" style="font-family: 'Amiri Quran', 'Amiri', serif; color: var(--surah-mode-text, #c9a84c)">{{ surah.name_arabic }}</span>
+      </div>
+
+      <div class="text-left">
+        <span class="block text-base font-bold" style="font-family: 'Amiri', serif; color: var(--surah-mode-text, #c9a84c)">{{ juz_ar }}</span>
+        <span class="block text-xs surah-sub-label">الجزء</span>
+      </div>
+    </div>
   </div>
 
-  <div class="mt-6 space-y-4">
-    {% for v in verses %}
-    <article id="ayah-{{ v.verse_key }}" class="rounded-2xl p-6" style="background:rgba(201,168,76,.02);border:1px solid rgba(201,168,76,.08)">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <span class="h-9 w-9 rounded-lg bg-[#c9a84c]/20 text-[#f0c060] flex items-center justify-center">{{ v.verse_number }}</span>
-        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <audio controls preload="none" class="h-8 w-full sm:w-auto">{% if v.audio.url %}<source src="{{ v.audio.url }}">{% endif %}</audio>
-          {% if user.is_authenticated %}
-          <form method="post" action="/quran/favorites/add/">{% csrf_token %}<input type="hidden" name="surah_number" value="{{ chapter.id }}"><input type="hidden" name="ayah_number" value="{{ v.verse_number }}"><button class="px-2 py-1 rounded border border-[#c9a84c]/30 text-[#c9a84c]">🔖</button></form>
-          {% endif %}
+  <div class="flex items-center justify-center mt-4 mb-6 px-4">
+    <div class="relative w-full max-w-xs">
+      <div class="rounded-xl p-1" style="border: 2px solid rgba(201,168,76,0.6); background: rgba(201,168,76,0.05)">
+        <div class="rounded-lg px-4 py-2 flex items-center justify-between gap-2" style="border: 1px solid rgba(201,168,76,0.25); background: rgba(201,168,76,0.03)">
+          <svg width="28" height="28" viewBox="0 0 28 28" flex-shrink="0">
+            <circle cx="14" cy="14" r="12" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.8"/>
+            <circle cx="14" cy="14" r="8" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+            <circle cx="14" cy="14" r="4" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+            <circle cx="14" cy="14" r="1.5" fill="#c9a84c"/>
+            <line x1="14" y1="1" x2="14" y2="4" stroke="#c9a84c" stroke-width="1"/>
+            <line x1="14" y1="24" x2="14" y2="27" stroke="#c9a84c" stroke-width="1"/>
+            <line x1="1" y1="14" x2="4" y2="14" stroke="#c9a84c" stroke-width="1"/>
+            <line x1="24" y1="14" x2="27" y2="14" stroke="#c9a84c" stroke-width="1"/>
+          </svg>
+
+          <div class="flex items-center gap-1">
+            <div class="w-1 h-1 rounded-full bg-[#c9a84c]"></div>
+            <div class="w-6 h-px bg-[#c9a84c] opacity-60"></div>
+            <div class="w-1.5 h-1.5 rounded-full bg-[#c9a84c]"></div>
+          </div>
+
+          <span class="text-xl font-bold" style="font-family: 'Amiri Quran', 'Amiri', serif; direction: rtl; color: var(--surah-mode-text, #c9a84c); text-shadow: 0 0 20px rgba(201,168,76,0.4)">{{ surah.name_arabic }}</span>
+
+          <div class="flex items-center gap-1">
+            <div class="w-1.5 h-1.5 rounded-full bg-[#c9a84c]"></div>
+            <div class="w-6 h-px bg-[#c9a84c] opacity-60"></div>
+            <div class="w-1 h-1 rounded-full bg-[#c9a84c]"></div>
+          </div>
+
+          <svg width="28" height="28" viewBox="0 0 28 28" flex-shrink="0">
+            <circle cx="14" cy="14" r="12" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.8"/>
+            <circle cx="14" cy="14" r="8" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+            <circle cx="14" cy="14" r="4" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+            <circle cx="14" cy="14" r="1.5" fill="#c9a84c"/>
+            <line x1="14" y1="1" x2="14" y2="4" stroke="#c9a84c" stroke-width="1"/>
+            <line x1="14" y1="24" x2="14" y2="27" stroke="#c9a84c" stroke-width="1"/>
+            <line x1="1" y1="14" x2="4" y2="14" stroke="#c9a84c" stroke-width="1"/>
+            <line x1="24" y1="14" x2="27" y2="14" stroke="#c9a84c" stroke-width="1"/>
+          </svg>
         </div>
       </div>
-      <p class="font-amiri text-3xl sm:text-4xl leading-loose text-right text-white tracking-wide" dir="rtl" lang="ar">{{ v.text_uthmani }} ۝</p>
-    </article>
+    </div>
+  </div>
+
+  {% if surah_number != 9 %}
+  <div class="bismillah-text px-4 mx-4 mb-6">
+    بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+  </div>
+  {% endif %}
+
+  <div class="mushaf-text mx-2" id="mushaf-content">
+    {% for verse in verses %}
+      <span class="ayah-text" id="ayah-{{ verse.verse_number }}">{{ verse.text_uthmani }}</span>
+      <span class="ayah-number" onclick="playAyah({{ verse.verse_number }}, '{% if verse.audio %}{{ verse.audio.url|escapejs }}{% endif %}')">
+        <svg viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="15" stroke="#c9a84c" stroke-width="1.2" fill="none" opacity="0.9"/>
+          <circle cx="18" cy="18" r="10" stroke="#c9a84c" stroke-width="0.8" fill="none" opacity="0.6"/>
+          <circle cx="18" cy="2" r="1" fill="#c9a84c"/>
+          <circle cx="18" cy="34" r="1" fill="#c9a84c"/>
+          <circle cx="2" cy="18" r="1" fill="#c9a84c"/>
+          <circle cx="34" cy="18" r="1" fill="#c9a84c"/>
+        </svg>
+        <span>{{ verse.display_number_ar }}</span>
+      </span>
     {% endfor %}
   </div>
-</section>
+
+  <div class="flex justify-center mt-10 mb-8">
+    <span class="page-number-circle">{{ page_number_ar }}</span>
+  </div>
+
+  <div class="fixed bottom-20 left-0 right-0 px-4 flex justify-between items-center">
+    {% if next_surah %}
+    <a href="{% url 'quran:surah_detail' next_surah %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition" style="color: var(--surah-mode-text, #c9a84c); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3)">
+      <i class="fa-solid fa-chevron-right"></i>
+      السورة التالية
+    </a>
+    {% else %}<div></div>{% endif %}
+
+    {% if prev_surah %}
+    <a href="{% url 'quran:surah_detail' prev_surah %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition" style="color: var(--surah-mode-text, #c9a84c); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3)">
+      السورة السابقة
+      <i class="fa-solid fa-chevron-left"></i>
+    </a>
+    {% else %}<div></div>{% endif %}
+  </div>
+</div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+const audio = new Audio();
+let activeVerse = null;
+
+function playAyah(verseNum, audioUrl) {
+  if (!audioUrl) return;
+
+  if (activeVerse) {
+    document.getElementById('ayah-' + activeVerse)?.classList.remove('ayah-active');
+  }
+
+  if (activeVerse === verseNum && !audio.paused) {
+    audio.pause();
+    activeVerse = null;
+    return;
+  }
+
+  activeVerse = verseNum;
+  document.getElementById('ayah-' + verseNum)?.classList.add('ayah-active');
+
+  audio.src = audioUrl;
+  audio.play();
+
+  document.getElementById('ayah-' + verseNum)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  audio.onended = () => {
+    document.getElementById('ayah-' + verseNum)?.classList.remove('ayah-active');
+    activeVerse = null;
+  };
+}
+</script>
+{% endblock %}
+

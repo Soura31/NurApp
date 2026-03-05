@@ -10,12 +10,12 @@ class LandingPageView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["plans"] = Plan.objects.all()
         context["features"] = [
-            "Coran avec traductions multiplies",
-            "Horaires de priere geolocalises",
-            "Audio recitateurs premium",
-            "Azkar avec compteur intelligent",
-            "Forum communaute modere",
-            "Dashboard spirituel personnel",
+            {"label": "Coran avec traductions multiplies", "url": "/quran/"},
+            {"label": "Horaires de priere geolocalises", "url": "/prayer-times/"},
+            {"label": "Audio recitateurs premium", "url": "/subscriptions/plans/"},
+            {"label": "Azkar avec compteur intelligent", "url": "/azkar/"},
+            {"label": "Forum communaute modere", "url": "/community/"},
+            {"label": "Dashboard spirituel personnel", "url": "/dashboard/"},
         ]
         context["testimonials"] = [
             {"name": "Amina B.", "text": "NurCoran m'aide a rester reguliere dans mes rappels."},

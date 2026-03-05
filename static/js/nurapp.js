@@ -51,3 +51,47 @@ function triggerTasbihPulse(btn) {
   btn.classList.add('tasbih-pulse');
 }
 
+function applyTheme(theme) {
+  const html = document.documentElement;
+  const body = document.body;
+  const isLight = theme === 'light';
+  html.setAttribute('data-theme', theme);
+  html.style.colorScheme = isLight ? 'light' : 'dark';
+  if (body) {
+    body.classList.toggle('theme-light', isLight);
+    body.classList.toggle('theme-dark', !isLight);
+  }
+
+  const desktopIcon = document.getElementById('theme-toggle-icon');
+  const mobileIcon = document.getElementById('theme-toggle-mobile-icon');
+  const mobileText = document.getElementById('theme-toggle-mobile-text');
+  const desktopBtn = document.getElementById('theme-toggle');
+
+  if (desktopIcon) desktopIcon.className = isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  if (mobileIcon) mobileIcon.className = isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  if (mobileText) mobileText.textContent = isLight ? 'Mode nuit' : 'Mode jour';
+  if (desktopBtn) desktopBtn.setAttribute('aria-label', isLight ? 'Activer le mode nuit' : 'Activer le mode jour');
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'light' ? 'dark' : 'light';
+  applyTheme(next);
+  try {
+    localStorage.setItem('nur-theme', next);
+  } catch (e) {}
+}
+
+window.toggleTheme = toggleTheme;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = (() => {
+    try {
+      return localStorage.getItem('nur-theme');
+    } catch (e) {
+      return null;
+    }
+  })();
+  applyTheme(saved || document.documentElement.getAttribute('data-theme') || 'dark');
+});
+

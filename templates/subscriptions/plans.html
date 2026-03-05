@@ -18,10 +18,10 @@
     {% endif %}
     <h2 class="text-2xl font-bold text-white text-center">{{ plan.name }}</h2>
     <div class="text-center mt-3">
-      <span class="stat-value">{{ plan.price_monthly|fcfa }}</span>
+      <span class="stat-value nur-price-value">{{ plan.price_monthly|fcfa }}</span>
       <span class="text-muted text-sm"> / mois</span>
     </div>
-    <p class="text-center text-muted text-sm mt-1">{{ plan.price_yearly|fcfa }} / an</p>
+    <p class="text-center text-muted text-sm mt-1"><span class="nur-price-value">{{ plan.price_yearly|fcfa }}</span> / an</p>
     <div class="divider-gold my-5"></div>
     <ul class="feature-list space-y-2">
       {% for f in plan.features %}<li>{{ f }}</li>{% endfor %}
@@ -45,4 +45,10 @@
   </article>
   {% endfor %}
 </div>
+{% if not plans %}
+<div class="max-w-3xl mx-auto mt-8 text-center rounded-2xl p-6 border border-[#c9a84c]/25 bg-[#161b22]">
+  <p class="text-[#e6edf3]">Aucun plan n'est disponible pour le moment.</p>
+  <p class="text-[#8b949e] text-sm mt-2">Ajoute des plans depuis l'admin pour activer la partie abonnement premium.</p>
+</div>
+{% endif %}
 {% endblock %}

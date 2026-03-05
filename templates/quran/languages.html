@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Langues disponibles{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="font-cinzel text-4xl text-white">Langues disponibles</h1>
+    <a href="/quran/" class="px-4 py-2 rounded-xl border border-[#c9a84c]/40 text-[#c9a84c]">Retour au Coran</a>
+  </div>
+  <p class="text-[#8b949e] mt-3">Choisissez votre langue de lecture et de traduction.</p>
+
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+    {% for language in languages %}
+    <article class="rounded-2xl p-4 border border-[#c9a84c]/20 bg-[#161b22] text-white flex items-center gap-3">
+      <span class="h-10 w-10 rounded-full bg-[#c9a84c]/15 border border-[#c9a84c]/40 flex items-center justify-center text-[#f0c060]">
+        <i class="fa-solid fa-language"></i>
+      </span>
+      <span class="font-semibold">{{ language }}</span>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

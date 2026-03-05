@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% block title %}Al-Quran Al-Karim{% endblock %}
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
@@ -23,12 +23,13 @@
 
   <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
     {% for c in chapters %}
-    <a href="/quran/{{ c.id }}/" class="group rounded-xl p-4 premium-lift" style="background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.1)">
-      <div class="h-10 w-10 rounded-lg bg-[#c9a84c]/20 text-[#f0c060] flex items-center justify-center font-bold">{{ c.id }}</div>
-      <p class="font-amiri text-2xl text-white text-right mt-3" dir="rtl" lang="ar">{{ c.name_arabic }}</p>
-      <p class="text-[#8b949e] text-xs mt-1">{{ c.verses_count }} ايات</p>
+    <a href="{% url 'quran:surah_detail' c.id %}" class="surah-row group rounded-xl p-4 premium-lift block" style="background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.1)">
+      <div class="h-10 w-10 rounded-lg bg-[#c9a84c]/20 text-[#f0c060] flex items-center justify-center font-bold">{{ c.id_ar }}</div>
+      <p class="font-amiri text-2xl surah-mode-text text-right mt-3" dir="rtl" lang="ar">{{ c.name_arabic }}</p>
+      <p class="text-[#8b949e] text-xs mt-1">{{ c.verses_count_ar }} ايات</p>
     </a>
     {% endfor %}
   </div>
 </section>
 {% endblock %}
+

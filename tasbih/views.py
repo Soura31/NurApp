@@ -1,34 +1,47 @@
-﻿from django.contrib import messages
+import json
+
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.shortcuts import render
 from django.views import View
-from django.views.generic import TemplateView
 
 from .models import TasbihSession
 
 
-class TasbihView(TemplateView):
+class TasbihView(View):
     template_name = "tasbih/index.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context["history"] = TasbihSession.objects.filter(user=self.request.user)[:20]
-        else:
-            context["history"] = []
-        context["presets"] = [
-            ("SubhanAllah", 33),
-            ("Alhamdulillah", 33),
-            ("AllahuAkbar", 33),
-        ]
-        return context
+    DHIKR_LIST = [
+        {"name": "SubhanAllah", "arabic": "سُبْحَانَ اللَّهِ", "target": 33},
+        {"name": "Alhamdulillah", "arabic": "الْحَمْدُ لِلَّهِ", "target": 33},
+        {"name": "AllahuAkbar", "arabic": "اللَّهُ أَكْبَرُ", "target": 33},
+    ]
+
+    def get(self, request):
+        sessions = []
+        if request.user.is_authenticated:
+            sessions = TasbihSession.objects.filter(user=request.user).order_by("-created_at")[:5]
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "dhikr_list": self.DHIKR_LIST,
+                "sessions": sessions,
+            },
+        )
 
 
-class SaveTasbihSessionView(LoginRequiredMixin, View):
+class SaveTasbihView(LoginRequiredMixin, View):
     def post(self, request):
-        dhikr_text = request.POST.get("dhikr_text", "SubhanAllah")
-        count = int(request.POST.get("count", 0))
-        target = int(request.POST.get("target", 33))
-        TasbihSession.objects.create(user=request.user, dhikr_text=dhikr_text, count=count, target=target)
-        messages.success(request, "Session Tasbih enregistree.")
-        return redirect("tasbih:index")
+        try:
+            data = json.loads(request.body or "{}")
+            TasbihSession.objects.create(
+                user=request.user,
+                dhikr_text=data.get("dhikr", ""),
+                count=int(data.get("count", 0)),
+                target=int(data.get("target", 33)),
+            )
+            return JsonResponse({"status": "ok"})
+        except Exception as exc:
+            return JsonResponse({"status": "error", "message": str(exc)}, status=400)
