@@ -4,9 +4,11 @@ from django.contrib import admin
 from django.urls import include, path
 
 from dashboard.views import AdminPanelView
+from config.views import OfflineView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", include("pwa.urls")),
     path("accounts/", include("allauth.urls")),
     path("", include("users.urls")),
     path("admin-panel/", AdminPanelView.as_view(), name="admin_panel_root"),
@@ -20,6 +22,7 @@ urlpatterns = [
     path("hadith/", include("hadith.urls")),
     path("community/", include("community.urls")),
     path("dashboard/", include("dashboard.urls")),
+    path("offline/", OfflineView.as_view(), name="offline"),
 ]
 
 if settings.DEBUG:

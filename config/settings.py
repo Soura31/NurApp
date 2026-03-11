@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "hadith",
     "community",
     "dashboard",
+    "pwa",
 ]
 
 MIDDLEWARE = [
@@ -109,6 +110,26 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# PWA configuration
+PWA_APP_NAME = "NurCoran"
+PWA_APP_DESCRIPTION = "Application Islamique Premium"
+PWA_APP_THEME_COLOR = "#080c10"
+PWA_APP_BACKGROUND_COLOR = "#080c10"
+PWA_APP_DISPLAY = "standalone"
+PWA_APP_SCOPE = "/"
+PWA_APP_ORIENTATION = "portrait"
+PWA_APP_START_URL = "/"
+PWA_APP_STATUS_BAR_COLOR = "default"
+PWA_APP_ICONS = [
+    {"src": "/static/images/icon-192.png", "sizes": "192x192"},
+    {"src": "/static/images/icon-512.png", "sizes": "512x512"},
+]
+PWA_APP_SPLASH_SCREEN = [
+    {"src": "/static/images/splash.png", "media": "(device-width: 320px)"},
+]
+PWA_APP_DIR = "rtl"
+PWA_APP_LANG = "fr-FR"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
