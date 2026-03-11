@@ -1,0 +1,27 @@
+<svg width="180" height="180" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond degrade sombre arrondi iOS -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#080c10"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0c060"/>
+      <stop offset="100%" style="stop-color:#c9a84c"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="40" fill="url(#bg)"/>
+  <!-- Croissant de lune -->
+  <circle cx="90" cy="80" r="45" fill="url(#gold)"/>
+  <circle cx="110" cy="68" r="38" fill="#0d1117"/>
+  <!-- Etoile a 8 branches -->
+  <polygon points="90,45 94,62 108,55 101,69 118,73 
+                   101,77 108,91 94,84 90,101 86,84 
+                   72,91 79,77 62,73 79,69 72,55 86,62"
+           fill="url(#gold)" transform="translate(0,20)"/>
+  <!-- Texte ??? -->
+  <text x="90" y="155" 
+        font-family="Arial" font-size="22"
+        fill="#c9a84c" text-anchor="middle"
+        font-weight="bold">???</text>
+</svg>

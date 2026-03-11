@@ -122,8 +122,18 @@ PWA_APP_ORIENTATION = "portrait"
 PWA_APP_START_URL = "/"
 PWA_APP_STATUS_BAR_COLOR = "default"
 PWA_APP_ICONS = [
-    {"src": "/static/images/icon-192.png", "sizes": "192x192"},
-    {"src": "/static/images/icon-512.png", "sizes": "512x512"},
+    {
+        "src": "/static/images/icon-android.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable",
+    },
+    {
+        "src": "/static/images/icon-desktop.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any",
+    },
 ]
 PWA_APP_SPLASH_SCREEN = [
     {"src": "/static/images/splash.png", "media": "(device-width: 320px)"},

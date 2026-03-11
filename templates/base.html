@@ -10,9 +10,23 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="NurCoran">
+  <meta name="application-name" content="NurCoran">
   <meta name="theme-color" content="#080c10">
   <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/static/images/icon-192.png">
+  <!-- iOS iPhone -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/images/icon-ios.png">
+
+  <!-- iPad -->
+  <link rel="apple-touch-icon" sizes="167x167" href="/static/images/icon-ipad.png">
+
+  <!-- Android Chrome -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/images/icon-android.png">
+
+  <!-- Desktop -->
+  <link rel="icon" type="image/png" sizes="512x512" href="/static/images/icon-desktop.png">
+
+  <!-- Favicon navigateur -->
+  <link rel="shortcut icon" href="/static/images/icon-ios.png">
   <title>{% block title %}NurCoran{% endblock %}</title>
   <script>
     (function () {

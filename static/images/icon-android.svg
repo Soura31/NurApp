@@ -1,0 +1,35 @@
+<svg width="192" height="192" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a6b4a"/>
+      <stop offset="100%" style="stop-color:#0d4a33"/>
+    </linearGradient>
+    <linearGradient id="gold2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0c060"/>
+      <stop offset="100%" style="stop-color:#c9a84c"/>
+    </linearGradient>
+  </defs>
+  <!-- Fond vert arrondi Android -->
+  <rect width="192" height="192" rx="48" fill="url(#bg2)"/>
+  <!-- Dome mosquee -->
+  <ellipse cx="96" cy="85" rx="40" ry="35" fill="url(#gold2)"/>
+  <!-- Corps mosquee -->
+  <rect x="56" y="85" width="80" height="55" fill="url(#gold2)"/>
+  <!-- Porte mosquee -->
+  <rect x="82" y="105" width="28" height="35"
+        rx="14" fill="#0d4a33"/>
+  <!-- Minaret gauche -->
+  <rect x="42" y="65" width="14" height="75" fill="url(#gold2)"/>
+  <ellipse cx="49" cy="65" rx="7" ry="10" fill="url(#gold2)"/>
+  <!-- Minaret droite -->
+  <rect x="136" y="65" width="14" height="75" fill="url(#gold2)"/>
+  <ellipse cx="143" cy="65" rx="7" ry="10" fill="url(#gold2)"/>
+  <!-- Croissant haut -->
+  <circle cx="96" cy="52" r="10" fill="url(#gold2)"/>
+  <circle cx="102" cy="48" r="8" fill="#1a6b4a"/>
+  <!-- Texte NurCoran -->
+  <text x="96" y="175"
+        font-family="Arial" font-size="16"
+        fill="#f0c060" text-anchor="middle"
+        font-weight="bold">NurCoran</text>
+</svg>
