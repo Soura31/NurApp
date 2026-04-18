@@ -5,7 +5,8 @@ from django.urls import reverse_lazy
 
 from community.models import ForumPost
 from payments.models import Payment
-from quran.models import Bookmark, Favorite
+from quran.models import Bookmark, Favorite, RecitationAttempt
+from quran.services import get_progress_snapshot
 from subscriptions.models import Plan
 from tasbih.models import TasbihSession
 from users.forms import ProfileForm
@@ -18,11 +19,14 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        progress_snapshot = get_progress_snapshot(user)
         context["stats"] = {
             "versets_lus": Favorite.objects.filter(user=user).count(),
             "prieres_suivies": 0,
             "tasbih_total": TasbihSession.objects.filter(user=user).aggregate(total=Sum("count")).get("total") or 0,
         }
+        context["quran_progress"] = progress_snapshot
+        context["recent_recitations"] = RecitationAttempt.objects.filter(user=user)[:5]
         return context
 
 

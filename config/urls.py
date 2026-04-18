@@ -5,6 +5,7 @@ from django.urls import include, path
 
 from dashboard.views import AdminPanelView
 from config.views import OfflineView
+from quran.views import HifzView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -22,6 +23,7 @@ urlpatterns = [
     path("hadith/", include("hadith.urls")),
     path("community/", include("community.urls")),
     path("dashboard/", include("dashboard.urls")),
+    path("hifz/", HifzView.as_view(), name="hifz"),
     path("offline/", OfflineView.as_view(), name="offline"),
 ]
 

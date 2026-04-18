@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Assistant Islamique{% endblock %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
+  <div class="rounded-[2rem] border border-[#c9a84c]/20 bg-[radial-gradient(circle_at_top,rgba(201,168,76,0.12),transparent_45%),linear-gradient(135deg,#080c10,#0d1117)] p-8">
+    <div class="max-w-3xl">
+      <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Assistant IA Islamique</p>
+      <h1 class="font-cinzel text-4xl text-white mt-3">Questions sur le Coran, les hadiths et la spiritualite</h1>
+      <p class="text-[#8b949e] mt-4">Posez vos questions. L'assistant doit rester strictement dans le cadre islamique et citer ses sources quand il repond.</p>
+    </div>
+
+    <div class="mt-8 rounded-[1.5rem] border border-[#c9a84c]/15 bg-black/20 backdrop-blur-md overflow-hidden">
+      <div id="assistant-page-messages" class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+        {% for item in assistant_history %}
+        <div class="flex {% if item.role == 'assistant' %}justify-start{% else %}justify-end{% endif %}">
+          <div class="max-w-[85%] rounded-2xl px-4 py-3 {% if item.role == 'assistant' %}bg-[#c9a84c]/12 border border-[#c9a84c]/20 text-[#f4ead0]{% else %}bg-[#1a6b4a]/30 border border-[#1a6b4a]/35 text-white{% endif %}">
+            {{ item.content|linebreaksbr }}
+          </div>
+        </div>
+        {% empty %}
+        <div class="text-[#8b949e]">Assalamu alaykum. Posez votre premiere question.</div>
+        {% endfor %}
+      </div>
+      <form id="assistant-page-form" class="border-t border-[#c9a84c]/15 p-4 flex gap-3">
+        {% csrf_token %}
+        <input id="assistant-page-input" type="text" class="flex-1 rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white" placeholder="Ex: Quelle est la signification de Ayat al-Kursi ?">
+        <button class="px-5 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Envoyer</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script>
+(function () {
+  const form = document.getElementById('assistant-page-form');
+  const input = document.getElementById('assistant-page-input');
+  const messages = document.getElementById('assistant-page-messages');
+  if (!form || !input || !messages) return;
+
+  function appendMessage(role, text) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `flex ${role === 'assistant' ? 'justify-start' : 'justify-end'}`;
+    const bubble = document.createElement('div');
+    bubble.className = `max-w-[85%] rounded-2xl px-4 py-3 ${role === 'assistant' ? 'bg-[#c9a84c]/12 border border-[#c9a84c]/20 text-[#f4ead0]' : 'bg-[#1a6b4a]/30 border border-[#1a6b4a]/35 text-white'}`;
+    bubble.innerHTML = String(text).replace(/\n/g, '<br>');
+    wrapper.appendChild(bubble);
+    messages.appendChild(wrapper);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function getCsrf() {
+    return document.cookie.split('; ').find((row) => row.startsWith('csrftoken='))?.split('=')[1] || '';
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const value = input.value.trim();
+    if (!value) return;
+    appendMessage('user', value);
+    input.value = '';
+    appendMessage('assistant', 'Analyse en cours...');
+    const loadingNode = messages.lastElementChild;
+
+    const formData = new FormData();
+    formData.append('message', value);
+    try {
+      const response = await fetch('/assistant/message/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCsrf() },
+        body: formData,
+      });
+      const data = await response.json();
+      loadingNode.remove();
+      appendMessage('assistant', data.reply || 'Reponse indisponible.');
+    } catch (error) {
+      loadingNode.remove();
+      appendMessage('assistant', "L'assistant est temporairement indisponible.");
+    }
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block title %}Mode Hifz{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
+  <div class="rounded-[2rem] border border-[#c9a84c]/20 bg-[radial-gradient(circle_at_top,rgba(201,168,76,0.12),transparent_45%),linear-gradient(135deg,#080c10,#0d1117)] p-8">
+    <div class="grid lg:grid-cols-[1.05fr,0.95fr] gap-8">
+      <div>
+        <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Mode Hifz</p>
+        <h1 class="font-cinzel text-4xl text-white mt-3">Memorisation intelligente du Coran</h1>
+        <p class="text-[#8b949e] mt-4">Ecoute, cache progressif, test de memoire, repetitions configurees et suivi des passages difficiles.</p>
+
+        <form action="{% url 'quran:hifz_create' %}" method="post" class="mt-6 grid gap-4">
+          {% csrf_token %}
+          <div class="grid sm:grid-cols-2 gap-4">
+            <select name="surah_number" class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white">
+              {% for chapter in chapters %}
+              <option value="{{ chapter.id }}" {% if chapter.id == selected_surah %}selected{% endif %}>{{ chapter.id }}. {{ chapter.translated_name.name|default:chapter.name_simple }}</option>
+              {% endfor %}
+            </select>
+            <input type="number" name="verses_per_day" min="1" value="{{ plan.verses_per_day }}" class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white" placeholder="Versets par jour">
+          </div>
+          <div class="grid sm:grid-cols-3 gap-4">
+            <input type="number" name="start_ayah" min="1" value="{{ selected_start }}" class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white" placeholder="Debut">
+            <input type="number" name="end_ayah" min="1" value="{{ selected_end }}" class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white" placeholder="Fin">
+            <select name="repetition_target" class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white">
+              <option value="3" {% if plan.repetition_target == 3 %}selected{% endif %}>3 repetitions</option>
+              <option value="5" {% if plan.repetition_target == 5 %}selected{% endif %}>5 repetitions</option>
+              <option value="10" {% if plan.repetition_target == 10 %}selected{% endif %}>10 repetitions</option>
+            </select>
+          </div>
+          <button class="w-fit px-6 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Creer / mettre a jour mon plan</button>
+        </form>
+
+        <div class="grid md:grid-cols-3 gap-4 mt-8">
+          <div class="rounded-2xl border border-[#c9a84c]/20 bg-white/5 p-4">
+            <p class="text-[#8b949e] text-sm">Mode 1</p>
+            <p class="text-white font-semibold mt-2">Ecoute</p>
+            <p class="text-[#8b949e] text-sm mt-2">Lisez et ecoutez le verset plusieurs fois.</p>
+          </div>
+          <div class="rounded-2xl border border-[#1a6b4a]/25 bg-[#1a6b4a]/10 p-4">
+            <p class="text-[#8b949e] text-sm">Mode 2</p>
+            <p class="text-white font-semibold mt-2">Cache progressif</p>
+            <p class="text-[#8b949e] text-sm mt-2">Les mots disparaissent progressivement a chaque repetition.</p>
+          </div>
+          <div class="rounded-2xl border border-[#c9a84c]/20 bg-white/5 p-4">
+            <p class="text-[#8b949e] text-sm">Mode 3</p>
+            <p class="text-white font-semibold mt-2">Test</p>
+            <p class="text-[#8b949e] text-sm mt-2">Recitez de memoire, puis corrigez-vous avec le micro.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-[1.75rem] border border-[#c9a84c]/20 bg-black/20 backdrop-blur-md p-6">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-[#f0c060] text-sm">Session active</p>
+            <h2 class="font-cinzel text-2xl text-white mt-2">Sourate {{ selected_surah }}</h2>
+          </div>
+          <span class="px-3 py-2 rounded-full border border-[#1a6b4a]/35 bg-[#1a6b4a]/10 text-[#9de3c4] text-sm">{{ plan.verses_per_day }} versets / jour</span>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button type="button" id="hifz-listen-mode" class="px-4 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Mode ecoute</button>
+          <button type="button" id="hifz-hide-mode" class="px-4 py-3 rounded-xl border border-[#c9a84c]/35 text-[#c9a84c]">Cache progressif</button>
+          <button type="button" id="hifz-test-mode" class="px-4 py-3 rounded-xl border border-[#1a6b4a]/35 text-[#9de3c4]">Mode test</button>
+        </div>
+
+        <div id="hifz-verses" class="mt-6 space-y-4">
+          {% for verse in selected_verses %}
+          <article class="rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5" data-verse-card data-repetition="0">
+            <p class="text-[#f0c060] text-sm">{{ verse.verse_key }}</p>
+            <p class="font-amiri text-3xl text-white leading-loose text-right mt-4" dir="rtl" data-verse-text>{{ verse.text_uthmani }}</p>
+            {% if verse.audio.url %}
+            <audio controls class="w-full mt-4">
+              <source src="{{ verse.audio.url }}" type="audio/mpeg">
+            </audio>
+            {% endif %}
+          </article>
+          {% empty %}
+          <p class="text-[#8b949e]">Aucun verset charge pour cette selection.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 grid lg:grid-cols-[0.95fr,1.05fr] gap-6">
+    <div class="bg-[#161b22] border border-[#c9a84c]/20 rounded-2xl p-5">
+      <h2 class="font-cinzel text-2xl text-white">Repetition espacee</h2>
+      <p class="text-[#8b949e] mt-3">Les passages difficiles reviennent plus souvent. Utilisez les actions ci-dessous pour ajuster la difficulte.</p>
+      <div class="space-y-3 mt-5">
+        {% for assignment in assignments %}
+        <div class="rounded-xl border border-white/8 bg-white/5 p-4" data-assignment-card>
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-white font-semibold">{{ assignment.surah_name|default:assignment.surah_number }} • {{ assignment.start_ayah }}-{{ assignment.end_ayah }}</p>
+              <p class="text-[#8b949e] text-sm mt-1">Repetitions {{ assignment.repetition_done }}/{{ assignment.repetition_target }} • Difficulté {{ assignment.difficulty }}</p>
+            </div>
+            {% if assignment.is_mastered %}
+            <span class="px-3 py-2 rounded-full border border-[#1a6b4a]/35 bg-[#1a6b4a]/10 text-[#9de3c4] text-xs">Maitrise</span>
+            {% endif %}
+          </div>
+          <div class="flex flex-wrap gap-2 mt-4">
+            <button type="button" class="hifz-update px-3 py-2 rounded-xl border border-[#c9a84c]/35 text-[#c9a84c]" data-id="{{ assignment.id }}" data-action="repeat">+ repetition</button>
+            <button type="button" class="hifz-update px-3 py-2 rounded-xl border border-[#1a6b4a]/35 text-[#9de3c4]" data-id="{{ assignment.id }}" data-action="difficult">Passage difficile</button>
+            <button type="button" class="hifz-update px-3 py-2 rounded-xl border border-red-400/35 text-red-300" data-id="{{ assignment.id }}" data-action="reset">Reset</button>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-[#8b949e]">Aucun plan Hifz cree pour le moment.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="bg-[#161b22] border border-[#c9a84c]/20 rounded-2xl p-5">
+      <h2 class="font-cinzel text-2xl text-white">Progression Hifz</h2>
+      <div class="grid sm:grid-cols-3 gap-4 mt-5">
+        <div class="rounded-xl border border-[#c9a84c]/20 bg-white/5 p-4">
+          <p class="text-[#8b949e] text-sm">Objectif</p>
+          <p class="text-[#f0c060] text-2xl font-bold mt-2">{{ plan.verses_per_day }} / jour</p>
+        </div>
+        <div class="rounded-xl border border-[#1a6b4a]/25 bg-[#1a6b4a]/10 p-4">
+          <p class="text-[#8b949e] text-sm">Repetitions</p>
+          <p class="text-[#9de3c4] text-2xl font-bold mt-2">{{ plan.repetition_target }}x</p>
+        </div>
+        <div class="rounded-xl border border-[#c9a84c]/20 bg-white/5 p-4">
+          <p class="text-[#8b949e] text-sm">Streak</p>
+          <p class="text-white text-2xl font-bold mt-2">{{ plan.streak_days }} jours</p>
+        </div>
+      </div>
+      <p class="text-[#8b949e] text-sm mt-6">Le mode test peut utiliser la correction de recitation IA depuis la page de lecture de la sourate selectionnee.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script>
+(function () {
+  const hideBtn = document.getElementById('hifz-hide-mode');
+  const listenBtn = document.getElementById('hifz-listen-mode');
+  const testBtn = document.getElementById('hifz-test-mode');
+  const verseCards = [...document.querySelectorAll('[data-verse-card]')];
+
+  function setMode(mode) {
+    verseCards.forEach((card) => {
+      const textEl = card.querySelector('[data-verse-text]');
+      const raw = textEl.dataset.raw || textEl.textContent;
+      textEl.dataset.raw = raw;
+      if (mode === 'listen') {
+        textEl.textContent = raw;
+      } else if (mode === 'hide') {
+        const words = raw.trim().split(/\s+/);
+        const hiddenCount = Math.min(words.length, (parseInt(card.dataset.repetition || '0', 10) + 1));
+        const visibleWords = words.map((word, index) => index >= words.length - hiddenCount ? 'ـــــ' : word);
+        textEl.textContent = visibleWords.join(' ');
+        card.dataset.repetition = String(hiddenCount);
+      } else if (mode === 'test') {
+        textEl.textContent = 'ـــــ ـــــ ـــــ ـــــ';
+      }
+    });
+  }
+
+  listenBtn?.addEventListener('click', () => setMode('listen'));
+  hideBtn?.addEventListener('click', () => setMode('hide'));
+  testBtn?.addEventListener('click', () => setMode('test'));
+
+  document.querySelectorAll('.hifz-update').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const formData = new FormData();
+      formData.append('assignment_id', button.dataset.id);
+      formData.append('action', button.dataset.action);
+      const csrfToken = document.cookie.split('; ').find((row) => row.startsWith('csrftoken='))?.split('=')[1];
+      try {
+        const response = await fetch('{% url "quran:hifz_update" %}', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrfToken || '' },
+          body: formData,
+        });
+        if (response.ok) window.location.reload();
+      } catch (error) {}
+    });
+  });
+})();
+</script>
+{% endblock %}

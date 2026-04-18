@@ -82,6 +82,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "users.context_processors.global_spiritual_context",
             ],
         },
     }
@@ -196,6 +197,10 @@ STRIPE_PRICE_IDS = {
 
 QURAN_API_BASE = config("QURAN_API_BASE", default="https://api.quran.com/api/v4")
 ALADHAN_API_BASE = config("ALADHAN_API_BASE", default="https://api.aladhan.com/v1")
+OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
+OPENAI_TRANSCRIBE_MODEL = config("OPENAI_TRANSCRIBE_MODEL", default="whisper-1")
+ANTHROPIC_API_KEY = config("ANTHROPIC_API_KEY", default="")
+ANTHROPIC_MODEL = config("ANTHROPIC_MODEL", default="claude-sonnet-4-20250514")
 
 CACHES = {
     "default": {

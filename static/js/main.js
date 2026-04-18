@@ -23,6 +23,7 @@
       setTimeout(() => el.remove(), 250);
     }, 4200);
   }
+  window.toast = toast;
 
   function initCounters() {
     document.querySelectorAll('[data-counter]').forEach((el) => {
@@ -122,6 +123,81 @@
     setInterval(tick, 1000);
   }
 
+  function initVerseOfDayNotifications() {
+    const button = document.getElementById('enable-verse-notification');
+    const dataNode = document.getElementById('global-verse-of-day-data');
+    if (!dataNode || !('Notification' in window)) return;
+
+    let verseData = null;
+    try {
+      verseData = JSON.parse(dataNode.textContent);
+    } catch (e) {
+      verseData = null;
+    }
+    if (!verseData) return;
+
+    const notificationKey = 'nur-verse-notification-enabled';
+    const sentKey = 'nur-verse-notification-last-sent';
+
+    async function showNotification() {
+      const today = new Date().toISOString().slice(0, 10);
+      try {
+        if (localStorage.getItem(sentKey) === today) return;
+      } catch (e) {}
+
+      const title = `${verseData.surah_name} ${verseData.ayah_number}`;
+      const body = verseData.translation_fr || verseData.transliteration || verseData.arabic_text;
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          await registration.showNotification(title, {
+            body,
+            icon: '/static/images/icon-192.png',
+            badge: '/static/images/icon-192.png',
+            tag: 'nur-verse-of-day',
+          });
+        } else {
+          new Notification(title, { body });
+        }
+        localStorage.setItem(sentKey, today);
+      } catch (e) {}
+    }
+
+    async function enableNotifications() {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        toast('Les notifications ont ete refusees.', 'warning');
+        return;
+      }
+      try { localStorage.setItem(notificationKey, '1'); } catch (e) {}
+      toast('Rappel du verset du jour active.', 'success');
+      scheduleNotification();
+    }
+
+    function scheduleNotification() {
+      let enabled = false;
+      try { enabled = localStorage.getItem(notificationKey) === '1'; } catch (e) {}
+      if (!enabled || Notification.permission !== 'granted') return;
+
+      const now = new Date();
+      const target = new Date(now);
+      target.setHours(7, 0, 0, 0);
+
+      if (now >= target) {
+        showNotification();
+        target.setDate(target.getDate() + 1);
+      }
+
+      const delay = target.getTime() - now.getTime();
+      if (delay > 0) {
+        window.setTimeout(showNotification, delay);
+      }
+    }
+
+    button?.addEventListener('click', enableNotifications);
+    scheduleNotification();
+  }
+
   window.tasbihApp = function tasbihApp() {
     return {
       presets: [
@@ -166,6 +242,7 @@
     initCounters();
     initStars();
     initPrayerCountdown();
+    initVerseOfDayNotifications();
 
     // Polling simple pour notifications
     setInterval(() => {

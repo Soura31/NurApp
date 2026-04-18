@@ -75,6 +75,10 @@ class PrayerTimesView(TemplateView):
         return context
 
 
+class QiblaView(TemplateView):
+    template_name = "prayer/qibla.html"
+
+
 class PrayerNotificationSettingsView(LoginRequiredMixin, View):
     def post(self, request):
         obj, _ = PrayerNotificationSetting.objects.get_or_create(user=request.user)

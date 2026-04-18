@@ -25,6 +25,40 @@
   </div>
 </section>
 
+{% if verse_of_day %}
+<section class="py-16 bg-[#080c10]" data-aos="fade-up">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="rounded-[2rem] overflow-hidden border border-[#c9a84c]/25 bg-[radial-gradient(circle_at_top,rgba(201,168,76,0.14),transparent_42%),linear-gradient(135deg,#080c10,#0d1117)] shadow-[0_0_50px_rgba(201,168,76,.08)] relative">
+      <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image:linear-gradient(45deg, rgba(201,168,76,.14) 25%, transparent 25%, transparent 50%, rgba(201,168,76,.14) 50%, rgba(201,168,76,.14) 75%, transparent 75%, transparent); background-size:26px 26px;"></div>
+      <div class="relative z-10 grid lg:grid-cols-[1.05fr,0.95fr] gap-8 p-8 sm:p-10">
+        <div>
+          <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Verset du jour</p>
+          <h2 class="font-cinzel text-4xl nur-gold-text mt-4">Une lumiere quotidienne</h2>
+          <p class="text-[#8b949e] mt-4 max-w-2xl">Un verset different est selectionne chaque jour pour accompagner la lecture, la meditation et les rappels du matin.</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="/quran/{{ verse_of_day.surah_number }}/" class="px-5 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Lire dans le Coran</a>
+            <button type="button" id="enable-verse-notification" class="px-5 py-3 rounded-xl border border-[#1a6b4a]/35 text-[#9de3c4] hover:bg-[#1a6b4a]/10">Activer le rappel de 7h</button>
+          </div>
+          <p class="text-xs text-[#8b949e] mt-4">Notification locale PWA envoyee a partir de 7h quand l'application est ouverte ou relancee avec les notifications actives.</p>
+        </div>
+
+        <div class="rounded-[1.75rem] border border-[#c9a84c]/20 bg-black/20 backdrop-blur-md p-6 sm:p-8">
+          <p class="text-[#f0c060] text-sm">{{ verse_of_day.surah_name_ar }} • {{ verse_of_day.verse_key }}</p>
+          <p class="font-amiri text-3xl sm:text-4xl text-white leading-loose text-right mt-5" dir="rtl" lang="ar">{{ verse_of_day.arabic_text }}</p>
+          <div class="h-px bg-[#c9a84c]/25 my-5"></div>
+          <p class="italic text-[#c9a84c]/80">{{ verse_of_day.transliteration }}</p>
+          <p class="text-[#e6edf3] mt-4 text-lg">{{ verse_of_day.translation_fr }}</p>
+          <a href="/quran/{{ verse_of_day.surah_number }}/#ayah-{{ verse_of_day.ayah_number }}" class="inline-flex items-center gap-2 mt-5 text-[#9de3c4] hover:text-[#c9a84c]">
+            {{ verse_of_day.surah_name }} • verset {{ verse_of_day.ayah_number }}
+            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <section class="py-12 bg-[#080c10]" data-aos="fade-up">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
     <h2 class="font-cinzel text-3xl text-center nur-gold-text mb-8">Cotes Explorer</h2>

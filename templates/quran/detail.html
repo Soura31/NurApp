@@ -8,7 +8,7 @@
   .mushaf-page-wrapper {
     background: var(--surah-page-bg, #080c10) !important;
     min-height: 100vh;
-    padding-bottom: 6rem;
+    padding-bottom: 8rem;
   }
 
   .mushaf-text {
@@ -37,13 +37,7 @@
 
   .ayah-number:hover { transform: scale(1.15); }
   .ayah-number:active { transform: scale(0.9); }
-
-  .ayah-number svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
+  .ayah-number svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
   .ayah-number span {
     position: relative;
@@ -59,6 +53,46 @@
     border-radius: 6px;
     padding: 2px 6px;
     transition: background 0.3s ease;
+  }
+
+  .ayah-fragment { display: inline; }
+
+  .ayah-action-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    vertical-align: middle;
+  }
+
+  .ayah-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.08);
+    color: #c9a84c;
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .ayah-action-btn:hover {
+    transform: translateY(-1px);
+    background: rgba(201,168,76,0.14);
+    border-color: rgba(201,168,76,0.55);
+  }
+
+  .ayah-recite-btn.is-recording {
+    animation: pulseRecite 1s ease infinite;
+    color: #f0c060;
+    border-color: rgba(240,192,96,0.7);
+    box-shadow: 0 0 18px rgba(201,168,76,0.35);
+  }
+
+  @keyframes pulseRecite {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
   }
 
   .bismillah-text {
@@ -88,21 +122,32 @@
     box-shadow: 0 4px 20px rgba(201,168,76,0.4);
   }
 
-  .mushaf-page-wrapper a,
-  .mushaf-page-wrapper p,
-  .mushaf-page-wrapper span,
-  .mushaf-page-wrapper div {
-    color: inherit;
-  }
-
   .surah-sticky-header {
     background: var(--surah-header-bg, rgba(8,12,16,0.95));
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(201,168,76,0.2);
   }
 
-  .surah-sub-label {
-    color: var(--surah-sub-label, #6b7280);
+  .surah-sub-label { color: var(--surah-sub-label, #6b7280); }
+
+  .tajweed-word { transition: color 0.2s ease; }
+  .tajweed-ghunna { color: #49c07d; }
+  .tajweed-ikhfaa { color: #7dd3fc; }
+  .tajweed-idgham { color: #fb923c; }
+  .tajweed-qalqalah { color: #facc15; }
+  .tajweed-madd { color: #fb7185; }
+  .tajweed-ikhfaa-shafawi { color: #c084fc; }
+  .tajweed-default { color: #f0c060; }
+  .tajweed-end { color: rgba(201,168,76,0.75); }
+
+  .tajweed-off .tajweed-word,
+  .tajweed-off .tajweed-end {
+    color: var(--surah-mode-main, #c9a84c) !important;
+  }
+
+  .side-panel-backdrop {
+    background: rgba(5, 8, 10, 0.78);
+    backdrop-filter: blur(16px);
   }
 
   html[data-theme="dark"] .mushaf-page-wrapper,
@@ -116,8 +161,8 @@
 
   html[data-theme="light"] .mushaf-page-wrapper,
   body.theme-light .mushaf-page-wrapper {
-    --surah-mode-text: #000000;
-    --surah-mode-main: #000000;
+    --surah-mode-text: #0f172a;
+    --surah-mode-main: #0f172a;
     --surah-page-bg: #f8fafc;
     --surah-header-bg: rgba(248,250,252,0.95);
     --surah-sub-label: #64748b;
@@ -126,90 +171,104 @@
 {% endblock %}
 
 {% block content %}
-<div class="mushaf-page-wrapper">
+<div class="mushaf-page-wrapper tajweed-off" id="surah-reader">
   <div class="sticky top-0 z-50 px-4 py-3 surah-sticky-header">
-    <div class="flex items-center justify-between" dir="rtl">
-      <div class="text-right">
-        <span class="block text-base font-bold" style="font-family: 'Amiri', serif; color: var(--surah-mode-text, #c9a84c)">{{ hizb_ar }}</span>
-        <span class="block text-xs surah-sub-label">حزب</span>
-      </div>
-
-      <div class="px-6 py-1 rounded-lg" style="border: 1px solid rgba(201,168,76,0.5); background: rgba(201,168,76,0.08)">
-        <span class="text-lg font-bold" style="font-family: 'Amiri Quran', 'Amiri', serif; color: var(--surah-mode-text, #c9a84c)">{{ surah.name_arabic }}</span>
-      </div>
-
-      <div class="text-left">
-        <span class="block text-base font-bold" style="font-family: 'Amiri', serif; color: var(--surah-mode-text, #c9a84c)">{{ juz_ar }}</span>
-        <span class="block text-xs surah-sub-label">الجزء</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="flex items-center justify-center mt-4 mb-6 px-4">
-    <div class="relative w-full max-w-xs">
-      <div class="rounded-xl p-1" style="border: 2px solid rgba(201,168,76,0.6); background: rgba(201,168,76,0.05)">
-        <div class="rounded-lg px-4 py-2 flex items-center justify-between gap-2" style="border: 1px solid rgba(201,168,76,0.25); background: rgba(201,168,76,0.03)">
-          <svg width="28" height="28" viewBox="0 0 28 28" flex-shrink="0">
-            <circle cx="14" cy="14" r="12" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.8"/>
-            <circle cx="14" cy="14" r="8" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
-            <circle cx="14" cy="14" r="4" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
-            <circle cx="14" cy="14" r="1.5" fill="#c9a84c"/>
-            <line x1="14" y1="1" x2="14" y2="4" stroke="#c9a84c" stroke-width="1"/>
-            <line x1="14" y1="24" x2="14" y2="27" stroke="#c9a84c" stroke-width="1"/>
-            <line x1="1" y1="14" x2="4" y2="14" stroke="#c9a84c" stroke-width="1"/>
-            <line x1="24" y1="14" x2="27" y2="14" stroke="#c9a84c" stroke-width="1"/>
-          </svg>
-
-          <div class="flex items-center gap-1">
-            <div class="w-1 h-1 rounded-full bg-[#c9a84c]"></div>
-            <div class="w-6 h-px bg-[#c9a84c] opacity-60"></div>
-            <div class="w-1.5 h-1.5 rounded-full bg-[#c9a84c]"></div>
-          </div>
-
-          <span class="text-xl font-bold" style="font-family: 'Amiri Quran', 'Amiri', serif; direction: rtl; color: var(--surah-mode-text, #c9a84c); text-shadow: 0 0 20px rgba(201,168,76,0.4)">{{ surah.name_arabic }}</span>
-
-          <div class="flex items-center gap-1">
-            <div class="w-1.5 h-1.5 rounded-full bg-[#c9a84c]"></div>
-            <div class="w-6 h-px bg-[#c9a84c] opacity-60"></div>
-            <div class="w-1 h-1 rounded-full bg-[#c9a84c]"></div>
-          </div>
-
-          <svg width="28" height="28" viewBox="0 0 28 28" flex-shrink="0">
-            <circle cx="14" cy="14" r="12" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.8"/>
-            <circle cx="14" cy="14" r="8" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
-            <circle cx="14" cy="14" r="4" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
-            <circle cx="14" cy="14" r="1.5" fill="#c9a84c"/>
-            <line x1="14" y1="1" x2="14" y2="4" stroke="#c9a84c" stroke-width="1"/>
-            <line x1="14" y1="24" x2="14" y2="27" stroke="#c9a84c" stroke-width="1"/>
-            <line x1="1" y1="14" x2="4" y2="14" stroke="#c9a84c" stroke-width="1"/>
-            <line x1="24" y1="14" x2="27" y2="14" stroke="#c9a84c" stroke-width="1"/>
-          </svg>
+    <div class="flex flex-col gap-4">
+      <div class="flex items-center justify-between" dir="rtl">
+        <div class="text-right">
+          <span class="block text-base font-bold" style="font-family: 'Amiri', serif; color: var(--surah-mode-text, #c9a84c)">{{ hizb_ar }}</span>
+          <span class="block text-xs surah-sub-label">حزب</span>
         </div>
+
+        <div class="px-6 py-1 rounded-lg" style="border: 1px solid rgba(201,168,76,0.5); background: rgba(201,168,76,0.08)">
+          <span class="text-lg font-bold" style="font-family: 'Amiri Quran', 'Amiri', serif; color: var(--surah-mode-text, #c9a84c)">{{ surah.name_arabic }}</span>
+        </div>
+
+        <div class="text-left">
+          <span class="block text-base font-bold" style="font-family: 'Amiri', serif; color: var(--surah-mode-text, #c9a84c)">{{ juz_ar }}</span>
+          <span class="block text-xs surah-sub-label">الجزء</span>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" id="tajweed-toggle" class="px-4 py-2 rounded-full border border-[#c9a84c]/35 text-[#c9a84c] hover:bg-[#c9a84c]/10">Mode Tajweed OFF</button>
+          <span class="px-4 py-2 rounded-full border {% if is_read_surah %}border-[#1a6b4a]/35 text-[#9de3c4] bg-[#1a6b4a]/10{% else %}border-[#c9a84c]/25 text-[#8b949e]{% endif %}" id="read-status-badge">
+            {% if is_read_surah %}Sourate lue ✓{% else %}Pas encore marquee comme lue{% endif %}
+          </span>
+        </div>
+        {% if user.is_authenticated %}
+        <form id="read-surah-form" class="flex items-center gap-3">
+          {% csrf_token %}
+          <input type="hidden" name="surah_number" value="{{ surah_number }}">
+          <input type="hidden" name="surah_name" value="{{ surah.name_simple|default:surah.translated_name.name }}">
+          <input type="hidden" name="surah_name_ar" value="{{ surah.name_arabic }}">
+          <input type="hidden" name="verses_count" value="{{ surah.verses_count|default:verses|length }}">
+          <button type="submit" id="toggle-read-surah" class="px-4 py-2 rounded-full text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">
+            {% if is_read_surah %}Retirer de ma progression{% else %}Marquer comme lue{% endif %}
+          </button>
+        </form>
+        {% endif %}
       </div>
     </div>
   </div>
 
   {% if surah_number != 9 %}
-  <div class="bismillah-text px-4 mx-4 mb-6">
-    بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-  </div>
+  <div class="bismillah-text px-4 mx-4 mb-6 mt-4">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
   {% endif %}
 
   <div class="mushaf-text mx-2" id="mushaf-content">
     {% for verse in verses %}
-      <span class="ayah-text" id="ayah-{{ verse.verse_number }}">{{ verse.text_uthmani }}</span>
-      <span class="ayah-number" onclick="playAyah({{ verse.verse_number }}, '{% if verse.audio %}{{ verse.audio.url|escapejs }}{% endif %}')">
-        <svg viewBox="0 0 36 36" fill="none">
-          <circle cx="18" cy="18" r="15" stroke="#c9a84c" stroke-width="1.2" fill="none" opacity="0.9"/>
-          <circle cx="18" cy="18" r="10" stroke="#c9a84c" stroke-width="0.8" fill="none" opacity="0.6"/>
-          <circle cx="18" cy="2" r="1" fill="#c9a84c"/>
-          <circle cx="18" cy="34" r="1" fill="#c9a84c"/>
-          <circle cx="2" cy="18" r="1" fill="#c9a84c"/>
-          <circle cx="34" cy="18" r="1" fill="#c9a84c"/>
-        </svg>
-        <span>{{ verse.display_number_ar }}</span>
+      <span class="ayah-fragment">
+        <span class="ayah-text" id="ayah-{{ verse.verse_number }}" data-plain-text="{{ verse.text_uthmani|escape }}" data-tajweed-html="{{ verse.tajweed_html|escape }}">
+          {{ verse.text_uthmani }}
+        </span>
+        <span class="ayah-action-group">
+          <span class="ayah-number" onclick="playAyah({{ verse.verse_number }}, '{% if verse.audio %}{{ verse.audio.url|escapejs }}{% endif %}')">
+            <svg viewBox="0 0 36 36" fill="none">
+              <circle cx="18" cy="18" r="15" stroke="#c9a84c" stroke-width="1.2" fill="none" opacity="0.9"/>
+              <circle cx="18" cy="18" r="10" stroke="#c9a84c" stroke-width="0.8" fill="none" opacity="0.6"/>
+              <circle cx="18" cy="2" r="1" fill="#c9a84c"/>
+              <circle cx="18" cy="34" r="1" fill="#c9a84c"/>
+              <circle cx="2" cy="18" r="1" fill="#c9a84c"/>
+              <circle cx="34" cy="18" r="1" fill="#c9a84c"/>
+            </svg>
+            <span>{{ verse.display_number_ar }}</span>
+          </span>
+          <button type="button" class="ayah-action-btn js-tafsir-btn" data-reference="{{ surah_number }}:{{ verse.verse_number }}" data-arabic="{{ verse.text_uthmani|escape }}" aria-label="Tafsir">
+            <i class="fa-solid fa-book-open text-[0.72rem]"></i>
+          </button>
+          <button type="button" class="ayah-action-btn ayah-share-btn js-share-verse" aria-label="Partager le verset {{ verse.verse_number }}" data-surah-number="{{ surah_number }}" data-surah-name="{{ surah.name_arabic|escape }}" data-surah-latin="{{ surah.name_simple|default:surah.translated_name.name|default:surah.name_arabic|escape }}" data-ayah-number="{{ verse.verse_number }}" data-verse-key="{{ surah_number }}:{{ verse.verse_number }}" data-arabic="{{ verse.text_uthmani|escape }}" data-translation="{{ verse.translation_fr|escape }}">
+            <i class="fa-solid fa-share-nodes text-[0.7rem]"></i>
+          </button>
+          {% if user.is_authenticated %}
+          <button type="button" class="ayah-action-btn ayah-recite-btn js-recite-verse" aria-label="Reciter le verset {{ verse.verse_number }}" data-surah-number="{{ surah_number }}" data-ayah-number="{{ verse.verse_number }}" data-verse-key="{{ surah_number }}:{{ verse.verse_number }}" data-reference-text="{{ verse.text_uthmani|escape }}">
+            <i class="fa-solid fa-microphone text-[0.7rem]"></i>
+          </button>
+          {% endif %}
+        </span>
       </span>
     {% endfor %}
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 mt-10">
+    <div class="rounded-3xl border border-[#c9a84c]/20 bg-[#0d1117] p-6">
+      <div class="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Legende Tajweed</p>
+          <h2 class="font-cinzel text-2xl text-white mt-2">Couleurs des regles</h2>
+        </div>
+        <p class="text-[#8b949e] text-sm">La preference du mode Tajweed est memorisee dans votre navigateur.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-5">
+        <div class="rounded-2xl border border-white/8 bg-white/5 p-4 text-white"><span class="inline-flex h-3 w-3 rounded-full bg-[#49c07d] mr-2"></span>Ghunna</div>
+        <div class="rounded-2xl border border-white/8 bg-white/5 p-4 text-white"><span class="inline-flex h-3 w-3 rounded-full bg-[#7dd3fc] mr-2"></span>Ikhfaa</div>
+        <div class="rounded-2xl border border-white/8 bg-white/5 p-4 text-white"><span class="inline-flex h-3 w-3 rounded-full bg-[#fb923c] mr-2"></span>Idgham</div>
+        <div class="rounded-2xl border border-white/8 bg-white/5 p-4 text-white"><span class="inline-flex h-3 w-3 rounded-full bg-[#facc15] mr-2"></span>Qalqalah</div>
+        <div class="rounded-2xl border border-white/8 bg-white/5 p-4 text-white"><span class="inline-flex h-3 w-3 rounded-full bg-[#fb7185] mr-2"></span>Madd</div>
+        <div class="rounded-2xl border border-white/8 bg-white/5 p-4 text-white"><span class="inline-flex h-3 w-3 rounded-full bg-[#c084fc] mr-2"></span>Ikhfaa Shafawi</div>
+      </div>
+    </div>
   </div>
 
   <div class="flex justify-center mt-10 mb-8">
@@ -219,17 +278,94 @@
   <div class="fixed bottom-20 left-0 right-0 px-4 flex justify-between items-center">
     {% if next_surah %}
     <a href="{% url 'quran:surah_detail' next_surah %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition" style="color: var(--surah-mode-text, #c9a84c); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3)">
-      <i class="fa-solid fa-chevron-right"></i>
-      السورة التالية
+      <i class="fa-solid fa-chevron-right"></i> السورة التالية
     </a>
     {% else %}<div></div>{% endif %}
 
     {% if prev_surah %}
     <a href="{% url 'quran:surah_detail' prev_surah %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition" style="color: var(--surah-mode-text, #c9a84c); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3)">
-      السورة السابقة
-      <i class="fa-solid fa-chevron-left"></i>
+      السورة السابقة <i class="fa-solid fa-chevron-left"></i>
     </a>
     {% else %}<div></div>{% endif %}
+  </div>
+
+  <div id="verse-share-modal" class="hidden fixed inset-0 z-[120] side-panel-backdrop px-4 py-6 sm:py-10">
+    <div class="max-w-4xl mx-auto bg-[#0d1117] border border-[#c9a84c]/25 rounded-[2rem] overflow-hidden h-full sm:h-auto">
+      <div class="grid lg:grid-cols-[0.95fr,1.05fr] h-full">
+        <div class="p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-[#c9a84c]/15">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Partager</p>
+              <h2 id="share-reference" class="font-cinzel text-2xl text-white mt-2">Verset</h2>
+            </div>
+            <button type="button" id="close-share-modal" class="h-10 w-10 rounded-full border border-[#c9a84c]/20 text-[#c9a84c]">×</button>
+          </div>
+          <canvas id="verse-share-canvas" width="1080" height="1350" class="hidden"></canvas>
+          <img id="verse-share-preview" alt="Apercu du verset" class="mt-6 rounded-[1.5rem] border border-[#c9a84c]/20 bg-[#080c10] w-full">
+        </div>
+        <div class="p-6 sm:p-8">
+          <div class="grid sm:grid-cols-2 gap-3">
+            <button type="button" id="native-share-btn" class="hidden px-4 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Partager</button>
+            <a id="share-whatsapp" href="#" target="_blank" rel="noreferrer" class="px-4 py-3 rounded-xl border border-[#25D366]/35 text-[#9af0be] hover:bg-[#25D366]/10">WhatsApp</a>
+            <a id="share-telegram" href="#" target="_blank" rel="noreferrer" class="px-4 py-3 rounded-xl border border-[#229ED9]/35 text-[#8ad6ff] hover:bg-[#229ED9]/10">Telegram</a>
+            <a id="share-twitter" href="#" target="_blank" rel="noreferrer" class="px-4 py-3 rounded-xl border border-white/15 text-white hover:bg-white/5">Twitter / X</a>
+            <a id="share-facebook" href="#" target="_blank" rel="noreferrer" class="px-4 py-3 rounded-xl border border-[#1877F2]/35 text-[#9cc8ff] hover:bg-[#1877F2]/10">Facebook</a>
+            <button type="button" id="download-share-image" class="px-4 py-3 rounded-xl border border-[#c9a84c]/35 text-[#f0c060] hover:bg-[#c9a84c]/10">Instagram / Telecharger</button>
+            <button type="button" id="copy-share-link" class="px-4 py-3 rounded-xl border border-[#1a6b4a]/35 text-[#9de3c4] hover:bg-[#1a6b4a]/10">Copier le lien</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tafsir-panel" class="hidden fixed inset-0 z-[125] side-panel-backdrop">
+    <div class="absolute inset-y-0 right-0 w-full max-w-2xl bg-[#0d1117] border-l border-[#c9a84c]/20 p-6 sm:p-8 overflow-y-auto">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Tafsir</p>
+          <h2 id="tafsir-reference" class="font-cinzel text-2xl text-white mt-2">Chargement...</h2>
+        </div>
+        <button type="button" id="close-tafsir-panel" class="h-10 w-10 rounded-full border border-[#c9a84c]/20 text-[#c9a84c]">×</button>
+      </div>
+      <div class="mt-5">
+        <label class="text-[#8b949e] text-sm">Choisir le tafsir</label>
+        <select id="tafsir-edition" class="mt-2 w-full rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white">
+          {% for key, option in tafisir_options.items %}
+          <option value="{{ key }}">{{ option.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mt-6 rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5">
+        <p id="tafsir-arabic" class="font-amiri text-3xl text-white leading-loose text-right" dir="rtl"></p>
+      </div>
+      <div class="mt-6 rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5">
+        <p id="tafsir-text" class="text-[#e6edf3] whitespace-pre-line"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="recitation-panel" class="hidden fixed inset-0 z-[125] side-panel-backdrop">
+    <div class="absolute inset-y-0 right-0 w-full max-w-xl bg-[#0d1117] border-l border-[#c9a84c]/20 p-6 sm:p-8 overflow-y-auto">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Correction de recitation</p>
+          <h2 id="recitation-reference" class="font-cinzel text-2xl text-white mt-2">Verset</h2>
+        </div>
+        <button type="button" id="close-recitation-panel" class="h-10 w-10 rounded-full border border-[#c9a84c]/20 text-[#c9a84c]">×</button>
+      </div>
+      <div class="mt-6 rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5">
+        <p id="recitation-score" class="text-[#f0c060] text-3xl font-black">--%</p>
+        <p id="recitation-feedback" class="text-[#8b949e] mt-2">En attente d'une analyse.</p>
+      </div>
+      <div class="mt-6 rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5">
+        <p class="text-[#8b949e] text-sm mb-3">Transcription</p>
+        <p id="recitation-transcript" class="text-white"></p>
+      </div>
+      <div class="mt-6 rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5">
+        <p class="text-[#8b949e] text-sm mb-3">Comparaison mot a mot</p>
+        <div id="recitation-words" class="flex flex-wrap gap-2"></div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -238,33 +374,348 @@
 <script>
 const audio = new Audio();
 let activeVerse = null;
+let currentShareVerse = null;
+let currentTafsirReference = null;
+let mediaRecorder = null;
+let mediaChunks = [];
 
 function playAyah(verseNum, audioUrl) {
   if (!audioUrl) return;
-
-  if (activeVerse) {
-    document.getElementById('ayah-' + activeVerse)?.classList.remove('ayah-active');
-  }
-
+  if (activeVerse) document.getElementById('ayah-' + activeVerse)?.classList.remove('ayah-active');
   if (activeVerse === verseNum && !audio.paused) {
     audio.pause();
     activeVerse = null;
     return;
   }
-
   activeVerse = verseNum;
   document.getElementById('ayah-' + verseNum)?.classList.add('ayah-active');
-
   audio.src = audioUrl;
   audio.play();
-
   document.getElementById('ayah-' + verseNum)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
   audio.onended = () => {
     document.getElementById('ayah-' + verseNum)?.classList.remove('ayah-active');
     activeVerse = null;
   };
 }
+
+(function () {
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return '';
+  }
+
+  function showToast(message, type = 'info') {
+    if (window.toast) window.toast(message, type);
+  }
+
+  const csrfToken = getCookie('csrftoken');
+  const reader = document.getElementById('surah-reader');
+  const tajweedToggle = document.getElementById('tajweed-toggle');
+  const readForm = document.getElementById('read-surah-form');
+  const readButton = document.getElementById('toggle-read-surah');
+  const readStatusBadge = document.getElementById('read-status-badge');
+  const shareModal = document.getElementById('verse-share-modal');
+  const closeShareModal = document.getElementById('close-share-modal');
+  const sharePreview = document.getElementById('verse-share-preview');
+  const shareCanvas = document.getElementById('verse-share-canvas');
+  const shareReference = document.getElementById('share-reference');
+  const nativeShareBtn = document.getElementById('native-share-btn');
+  const whatsappBtn = document.getElementById('share-whatsapp');
+  const telegramBtn = document.getElementById('share-telegram');
+  const twitterBtn = document.getElementById('share-twitter');
+  const facebookBtn = document.getElementById('share-facebook');
+  const downloadShareImage = document.getElementById('download-share-image');
+  const copyShareLink = document.getElementById('copy-share-link');
+
+  const tafsirPanel = document.getElementById('tafsir-panel');
+  const closeTafsirPanel = document.getElementById('close-tafsir-panel');
+  const tafsirReference = document.getElementById('tafsir-reference');
+  const tafsirArabic = document.getElementById('tafsir-arabic');
+  const tafsirText = document.getElementById('tafsir-text');
+  const tafsirEdition = document.getElementById('tafsir-edition');
+
+  const recitationPanel = document.getElementById('recitation-panel');
+  const closeRecitationPanel = document.getElementById('close-recitation-panel');
+  const recitationReference = document.getElementById('recitation-reference');
+  const recitationScore = document.getElementById('recitation-score');
+  const recitationFeedback = document.getElementById('recitation-feedback');
+  const recitationTranscript = document.getElementById('recitation-transcript');
+  const recitationWords = document.getElementById('recitation-words');
+
+  function applyTajweedMode(enabled) {
+    reader.classList.toggle('tajweed-off', !enabled);
+    document.querySelectorAll('.ayah-text').forEach((el) => {
+      if (enabled) {
+        el.innerHTML = el.dataset.tajweedHtml || el.dataset.plainText;
+      } else {
+        el.textContent = el.dataset.plainText || '';
+      }
+    });
+    tajweedToggle.textContent = `Mode Tajweed ${enabled ? 'ON' : 'OFF'}`;
+    try { localStorage.setItem('nur-tajweed-mode', enabled ? '1' : '0'); } catch (e) {}
+  }
+
+  const tajweedEnabled = (() => {
+    try { return localStorage.getItem('nur-tajweed-mode') === '1'; } catch (e) { return false; }
+  })();
+  applyTajweedMode(tajweedEnabled);
+  tajweedToggle?.addEventListener('click', () => applyTajweedMode(reader.classList.contains('tajweed-off')));
+
+  readForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = new FormData(readForm);
+    try {
+      const response = await fetch('/quran/read/toggle/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.marked) {
+        readButton.textContent = 'Retirer de ma progression';
+        readStatusBadge.textContent = 'Sourate lue ✓';
+        readStatusBadge.className = 'px-4 py-2 rounded-full border border-[#1a6b4a]/35 text-[#9de3c4] bg-[#1a6b4a]/10';
+      } else {
+        readButton.textContent = 'Marquer comme lue';
+        readStatusBadge.textContent = 'Pas encore marquee comme lue';
+        readStatusBadge.className = 'px-4 py-2 rounded-full border border-[#c9a84c]/25 text-[#8b949e]';
+      }
+      showToast('Progression Coran mise a jour.', 'success');
+    } catch (error) {
+      showToast('Impossible de mettre a jour la progression.', 'error');
+    }
+  });
+
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = String(text || '').split(' ');
+    let line = '';
+    const lines = [];
+    words.forEach((word) => {
+      const testLine = line ? `${line} ${word}` : word;
+      if (ctx.measureText(testLine).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = testLine;
+      }
+    });
+    if (line) lines.push(line);
+    lines.forEach((item, index) => ctx.fillText(item, x, y + (index * lineHeight)));
+  }
+
+  function buildShareLink(verse) {
+    return `${window.location.origin}/quran/${verse.surahNumber}/#ayah-${verse.ayahNumber}`;
+  }
+
+  function drawCard(verse) {
+    const ctx = shareCanvas.getContext('2d');
+    const width = shareCanvas.width;
+    const height = shareCanvas.height;
+    ctx.clearRect(0, 0, width, height);
+    const bg = ctx.createLinearGradient(0, 0, width, height);
+    bg.addColorStop(0, '#080c10');
+    bg.addColorStop(1, '#111827');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+    ctx.strokeStyle = 'rgba(201,168,76,0.18)';
+    for (let x = 70; x < width; x += 110) {
+      for (let y = 70; y < height; y += 110) {
+        ctx.beginPath();
+        ctx.arc(x, y, 24, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    ctx.strokeStyle = 'rgba(201,168,76,0.35)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(50, 50, width - 100, height - 100);
+    ctx.strokeRect(80, 80, width - 160, height - 160);
+    ctx.fillStyle = '#f0c060';
+    ctx.font = "700 34px Cinzel, serif";
+    ctx.textAlign = 'center';
+    ctx.fillText('NurCoran', width / 2, 150);
+    ctx.fillStyle = '#c9a84c';
+    ctx.font = "600 32px Cinzel, serif";
+    ctx.fillText(`${verse.surahLatin} • ${verse.verseKey}`, width / 2, 230);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = "700 58px 'Amiri', serif";
+    ctx.direction = 'rtl';
+    wrapText(ctx, verse.arabic, width - 150, 360, width - 300, 90);
+    ctx.direction = 'ltr';
+    ctx.fillStyle = '#e6edf3';
+    ctx.font = "500 34px Inter, sans-serif";
+    wrapText(ctx, verse.translation || ' ', 150, 760, width - 300, 52);
+    ctx.fillStyle = '#9de3c4';
+    ctx.font = "500 28px Inter, sans-serif";
+    ctx.fillText('Application islamique NurCoran', width / 2, height - 150);
+    return shareCanvas.toDataURL('image/png');
+  }
+
+  async function shareNatively(verse) {
+    const dataUrl = drawCard(verse);
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+    const file = new File([blob], `${verse.verseKey.replace(':', '-')}.png`, { type: 'image/png' });
+    const shareData = {
+      title: `Verset ${verse.verseKey}`,
+      text: `${verse.surahLatin} ${verse.ayahNumber}\n${verse.translation || ''}`.trim(),
+      url: buildShareLink(verse),
+      files: [file],
+    };
+    if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+      await navigator.share(shareData);
+    }
+  }
+
+  function openShareModal(verse) {
+    currentShareVerse = verse;
+    const dataUrl = drawCard(verse);
+    sharePreview.src = dataUrl;
+    shareReference.textContent = `${verse.surahLatin} • ${verse.verseKey}`;
+    const link = buildShareLink(verse);
+    const text = `${verse.surahLatin} ${verse.ayahNumber} — ${verse.translation || ''}`.trim();
+    whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(text + '\n' + link)}`;
+    telegramBtn.href = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`;
+    twitterBtn.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`;
+    facebookBtn.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
+    nativeShareBtn.classList.toggle('hidden', !(navigator.share));
+    shareModal.classList.remove('hidden');
+  }
+
+  document.querySelectorAll('.js-share-verse').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const verse = {
+        surahNumber: button.dataset.surahNumber,
+        surahLatin: button.dataset.surahLatin,
+        ayahNumber: button.dataset.ayahNumber,
+        verseKey: button.dataset.verseKey,
+        arabic: button.dataset.arabic,
+        translation: button.dataset.translation,
+      };
+      if (navigator.share && window.innerWidth < 768) {
+        try { await shareNatively(verse); return; } catch (error) {}
+      }
+      openShareModal(verse);
+    });
+  });
+
+  closeShareModal?.addEventListener('click', () => shareModal.classList.add('hidden'));
+  shareModal?.addEventListener('click', (event) => { if (event.target === shareModal) shareModal.classList.add('hidden'); });
+  nativeShareBtn?.addEventListener('click', async () => { if (currentShareVerse) { try { await shareNatively(currentShareVerse); } catch (error) {} } });
+  downloadShareImage?.addEventListener('click', () => {
+    if (!currentShareVerse) return;
+    const link = document.createElement('a');
+    link.href = drawCard(currentShareVerse);
+    link.download = `nurcoran-${currentShareVerse.verseKey.replace(':', '-')}.png`;
+    link.click();
+  });
+  copyShareLink?.addEventListener('click', async () => {
+    if (!currentShareVerse) return;
+    try { await navigator.clipboard.writeText(buildShareLink(currentShareVerse)); showToast('Lien copie.', 'success'); } catch (error) {}
+  });
+
+  async function loadTafsir() {
+    if (!currentTafsirReference) return;
+    tafsirReference.textContent = `Tafsir ${currentTafsirReference}`;
+    tafsirArabic.textContent = 'Chargement...';
+    tafsirText.textContent = 'Chargement...';
+    try {
+      const response = await fetch(`/quran/tafsir/?reference=${encodeURIComponent(currentTafsirReference)}&edition=${encodeURIComponent(tafsirEdition.value)}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Erreur');
+      tafsirReference.textContent = `${data.label} • ${data.reference}`;
+      tafsirArabic.textContent = data.arabic_text;
+      tafsirText.textContent = data.tafsir_text || 'Tafsir indisponible pour ce verset.';
+    } catch (error) {
+      tafsirArabic.textContent = '';
+      tafsirText.textContent = 'Impossible de charger le tafsir pour le moment.';
+    }
+  }
+
+  document.querySelectorAll('.js-tafsir-btn').forEach((button) => {
+    button.addEventListener('click', async () => {
+      currentTafsirReference = button.dataset.reference;
+      tafsirPanel.classList.remove('hidden');
+      await loadTafsir();
+    });
+  });
+  tafsirEdition?.addEventListener('change', loadTafsir);
+  closeTafsirPanel?.addEventListener('click', () => tafsirPanel.classList.add('hidden'));
+  tafsirPanel?.addEventListener('click', (event) => { if (event.target === tafsirPanel) tafsirPanel.classList.add('hidden'); });
+
+  function renderRecitationResult(data) {
+    recitationScore.textContent = `${data.score}%`;
+    recitationFeedback.textContent = data.feedback || '';
+    recitationTranscript.textContent = data.transcript || '';
+    recitationWords.innerHTML = (data.word_states || []).map((item) => `
+      <span class="px-3 py-2 rounded-full text-sm ${item.correct ? 'bg-[#1a6b4a]/15 text-[#9de3c4] border border-[#1a6b4a]/35' : 'bg-red-500/10 text-red-300 border border-red-400/35'}">${item.word}</span>
+    `).join('');
+  }
+
+  async function analyzeRecitation(button, blob) {
+    const formData = new FormData();
+    formData.append('audio', blob, 'recitation.webm');
+    formData.append('surah_number', button.dataset.surahNumber);
+    formData.append('ayah_number', button.dataset.ayahNumber);
+    formData.append('verse_key', button.dataset.verseKey);
+    formData.append('reference_text', button.dataset.referenceText);
+
+    recitationReference.textContent = button.dataset.verseKey;
+    recitationPanel.classList.remove('hidden');
+    recitationScore.textContent = '--%';
+    recitationFeedback.textContent = "Analyse en cours...";
+    recitationTranscript.textContent = '';
+    recitationWords.innerHTML = '';
+
+    try {
+      const response = await fetch('/quran/recitation/analyze/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Erreur');
+      renderRecitationResult(data);
+    } catch (error) {
+      recitationFeedback.textContent = "Impossible d'analyser la recitation.";
+    }
+  }
+
+  document.querySelectorAll('.js-recite-verse').forEach((button) => {
+    button.addEventListener('click', async () => {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        showToast("Le microphone n'est pas disponible sur ce navigateur.", 'warning');
+        return;
+      }
+      if (button.classList.contains('is-recording')) {
+        mediaRecorder?.stop();
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) mediaChunks.push(event.data);
+        };
+        mediaRecorder.onstop = async () => {
+          button.classList.remove('is-recording');
+          const blob = new Blob(mediaChunks, { type: 'audio/webm' });
+          stream.getTracks().forEach((track) => track.stop());
+          await analyzeRecitation(button, blob);
+        };
+        mediaRecorder.start();
+        button.classList.add('is-recording');
+        showToast('Enregistrement en cours. Cliquez encore pour terminer.', 'info');
+      } catch (error) {
+        showToast("Acces au microphone refuse.", 'error');
+      }
+    });
+  });
+
+  closeRecitationPanel?.addEventListener('click', () => recitationPanel.classList.add('hidden'));
+  recitationPanel?.addEventListener('click', (event) => { if (event.target === recitationPanel) recitationPanel.classList.add('hidden'); });
+})();
 </script>
 {% endblock %}
-

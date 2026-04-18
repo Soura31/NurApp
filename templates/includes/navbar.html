@@ -8,12 +8,21 @@
     <div class="hidden lg:flex items-center gap-6 text-sm">
       <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/quran/"><i class="fa-solid fa-book-quran"></i>Coran</a>
       <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/prayer-times/"><i class="fa-solid fa-clock"></i>Prieres</a>
+      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/prayer-times/qibla/"><i class="fa-solid fa-location-crosshairs"></i>Qibla</a>
+      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/calendar/"><i class="fa-solid fa-calendar-days"></i>Calendrier</a>
+      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/hifz/"><i class="fa-solid fa-brain"></i>Hifz</a>
+      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/assistant/"><i class="fa-solid fa-comments"></i>Assistant</a>
       <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/azkar/"><i class="fa-solid fa-hands-praying"></i>Azkar</a>
       <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/tasbih/"><i class="fa-solid fa-ring"></i>Tasbih</a>
       <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/community/"><i class="fa-solid fa-users"></i>Communaute</a>
     </div>
 
     <div class="hidden sm:flex items-center gap-2">
+      {% if navbar_hijri_today %}
+        <span class="hidden xl:inline-flex items-center gap-2 px-3 py-2 rounded-full border border-[#c9a84c]/30 bg-[#c9a84c]/10 text-[#f0c060] text-xs">
+          <i class="fa-solid fa-moon"></i>{{ navbar_hijri_today.label }}
+        </span>
+      {% endif %}
       <button type="button" id="theme-toggle" onclick="toggleTheme()" class="px-3 py-2 rounded-full border border-[#c9a84c]/50 text-[#c9a84c] hover:bg-[#c9a84c]/10" aria-label="Activer le mode jour">
         <i id="theme-toggle-icon" class="fa-solid fa-sun"></i>
       </button>
@@ -32,8 +41,17 @@
   </div>
 
   <div id="mobile-menu" class="mobile-menu lg:hidden px-6">
+    {% if navbar_hijri_today %}
+      <div class="text-xs text-[#f0c060] px-5 py-2 rounded-full border border-[#c9a84c]/30 bg-[#c9a84c]/10 inline-flex items-center gap-2">
+        <i class="fa-solid fa-moon"></i>{{ navbar_hijri_today.label }}
+      </div>
+    {% endif %}
     <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/quran/" onclick="toggleMobileMenu()"><i class="fa-solid fa-book-quran"></i>Coran</a>
     <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/prayer-times/" onclick="toggleMobileMenu()"><i class="fa-solid fa-clock"></i>Prieres</a>
+    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/prayer-times/qibla/" onclick="toggleMobileMenu()"><i class="fa-solid fa-location-crosshairs"></i>Qibla</a>
+    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/calendar/" onclick="toggleMobileMenu()"><i class="fa-solid fa-calendar-days"></i>Calendrier</a>
+    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/hifz/" onclick="toggleMobileMenu()"><i class="fa-solid fa-brain"></i>Hifz</a>
+    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/assistant/" onclick="toggleMobileMenu()"><i class="fa-solid fa-comments"></i>Assistant</a>
     <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/azkar/" onclick="toggleMobileMenu()"><i class="fa-solid fa-hands-praying"></i>Azkar</a>
     <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/tasbih/" onclick="toggleMobileMenu()"><i class="fa-solid fa-ring"></i>Tasbih</a>
     <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/community/" onclick="toggleMobileMenu()"><i class="fa-solid fa-users"></i>Communaute</a>

@@ -1,4 +1,4 @@
-const CACHE_NAME = "nurcoran-v1";
+const CACHE_NAME = "nurcoran-v3";
 const STATIC_ASSETS = [
   "/",
   "/offline/",
@@ -11,6 +11,10 @@ const STATIC_ASSETS = [
   "/azkar/",
   "/tasbih/",
   "/prayer-times/",
+  "/prayer-times/qibla/",
+  "/calendar/",
+  "/assistant/",
+  "/hifz/",
 ];
 
 self.addEventListener("install", (event) => {
@@ -44,5 +48,18 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))
     )
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ("focus" in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow("/");
+      return null;
+    })
   );
 });

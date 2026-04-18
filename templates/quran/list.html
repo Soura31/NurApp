@@ -4,6 +4,7 @@
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
   <h1 class="font-cinzel text-4xl text-white">Al-Quran Al-Karim</h1>
   <p class="font-amiri text-3xl text-[#c9a84c] mt-2" dir="rtl" lang="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+
   <div class="mt-5 flex flex-wrap items-center gap-3">
     <a href="/quran/pages/1/" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Lecture par page (arabe)</a>
     <form action="/quran/pages/1/" method="get" onsubmit="this.action='/quran/pages/' + this.page_number.value + '/';" class="flex items-center gap-2">
@@ -11,7 +12,19 @@
       <button class="px-4 py-2 rounded-xl border border-[#c9a84c]/40 text-[#c9a84c]">Ouvrir page</button>
     </form>
   </div>
-  <form class="mt-5 grid md:grid-cols-[1fr,auto,auto] gap-3" method="get">
+
+  <div class="mt-8 rounded-[1.75rem] border border-[#c9a84c]/20 bg-[radial-gradient(circle_at_top,rgba(201,168,76,0.12),transparent_45%),linear-gradient(135deg,#080c10,#0d1117)] p-6 sm:p-8">
+    <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Recherche Coranique</p>
+    <h2 class="font-cinzel text-3xl text-white mt-3">Trouver un mot, une sourate ou un verset</h2>
+    <p class="text-[#8b949e] mt-3">Recherche instantanee en francais, en arabe, par numero de sourate ou reference comme <span class="text-[#f0c060]">2:255</span>.</p>
+    <div class="mt-5">
+      <input id="quran-live-search" type="text" placeholder="Ex: misericorde, الرحمن, 2, 2:255" class="w-full rounded-2xl bg-[#161b22] border border-[#c9a84c]/20 px-5 py-4 text-white outline-none focus:border-[#c9a84c]/60">
+    </div>
+    <div id="quran-search-status" class="text-[#8b949e] text-sm mt-3 hidden"></div>
+    <div id="quran-search-results" class="grid gap-4 mt-6 hidden"></div>
+  </div>
+
+  <form class="mt-8 grid md:grid-cols-[1fr,auto,auto] gap-3" method="get">
     <input type="text" name="q" value="{{ q }}" placeholder="Rechercher une sourate" class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white">
     <select name="revelation_place" class="rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white">
       <option value="">Toutes</option>
@@ -24,12 +37,99 @@
   <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
     {% for c in chapters %}
     <a href="{% url 'quran:surah_detail' c.id %}" class="surah-row group rounded-xl p-4 premium-lift block" style="background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.1)">
-      <div class="h-10 w-10 rounded-lg bg-[#c9a84c]/20 text-[#f0c060] flex items-center justify-center font-bold">{{ c.id_ar }}</div>
+      <div class="flex items-center justify-between gap-3">
+        <div class="h-10 w-10 rounded-lg bg-[#c9a84c]/20 text-[#f0c060] flex items-center justify-center font-bold">{{ c.id_ar }}</div>
+        {% if c.id in read_surah_ids %}
+        <span class="h-8 w-8 rounded-full bg-[#1a6b4a]/20 border border-[#1a6b4a]/35 text-[#9de3c4] flex items-center justify-center">✓</span>
+        {% endif %}
+      </div>
       <p class="font-amiri text-2xl surah-mode-text text-right mt-3" dir="rtl" lang="ar">{{ c.name_arabic }}</p>
-      <p class="text-[#8b949e] text-xs mt-1">{{ c.verses_count_ar }} ايات</p>
+      <p class="text-[#8b949e] text-xs mt-1">{{ c.verses_count_ar }} ayats</p>
     </a>
     {% endfor %}
   </div>
 </section>
 {% endblock %}
+{% block extra_js %}
+<script>
+(function () {
+  const input = document.getElementById('quran-live-search');
+  const resultsEl = document.getElementById('quran-search-results');
+  const statusEl = document.getElementById('quran-search-status');
+  if (!input || !resultsEl || !statusEl) return;
 
+  let timeoutId = null;
+
+  function escapeHtml(value) {
+    return String(value || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function highlight(text, query) {
+    const safeText = escapeHtml(text);
+    const trimmed = (query || '').trim();
+    if (!trimmed) return safeText;
+    const escapedQuery = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return safeText.replace(new RegExp(escapedQuery, 'gi'), (match) => `<mark class="bg-[#c9a84c]/20 text-[#f0c060] px-1 rounded">${match}</mark>`);
+  }
+
+  function renderResults(results, query) {
+    if (!results.length) {
+      resultsEl.classList.add('hidden');
+      statusEl.classList.remove('hidden');
+      statusEl.textContent = 'Aucun verset trouve pour cette recherche.';
+      resultsEl.innerHTML = '';
+      return;
+    }
+
+    statusEl.classList.add('hidden');
+    resultsEl.classList.remove('hidden');
+    resultsEl.innerHTML = results.map((item) => `
+      <a href="${item.url}" class="block rounded-2xl border border-[#c9a84c]/20 bg-[#161b22] p-5 hover:border-[#c9a84c]/45 hover:bg-[#1c2330] transition">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-[#f0c060] text-sm">${escapeHtml(item.surah_name_ar)} • ${escapeHtml(item.verse_key)}</p>
+            <p class="font-amiri text-3xl text-white leading-loose text-right mt-4" dir="rtl" lang="ar">${highlight(item.arabic_text, query)}</p>
+          </div>
+          <span class="text-[#9de3c4] text-xs border border-[#1a6b4a]/35 bg-[#1a6b4a]/10 rounded-full px-3 py-2">Ouvrir</span>
+        </div>
+        <div class="h-px bg-[#c9a84c]/20 my-4"></div>
+        <p class="text-[#e6edf3]">${highlight(item.translation_fr, query)}</p>
+        <p class="text-[#8b949e] italic mt-3">${escapeHtml(item.surah_name)} • verset ${escapeHtml(item.ayah_number)}</p>
+      </a>
+    `).join('');
+  }
+
+  async function searchQuran(query) {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      resultsEl.classList.add('hidden');
+      statusEl.classList.add('hidden');
+      resultsEl.innerHTML = '';
+      return;
+    }
+    statusEl.classList.remove('hidden');
+    statusEl.textContent = 'Recherche en cours...';
+
+    try {
+      const response = await fetch(`/quran/search/?q=${encodeURIComponent(trimmed)}`);
+      const data = await response.json();
+      renderResults(data.results || [], trimmed);
+    } catch (error) {
+      resultsEl.classList.add('hidden');
+      statusEl.classList.remove('hidden');
+      statusEl.textContent = 'La recherche est indisponible pour le moment.';
+    }
+  }
+
+  input.addEventListener('input', () => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => searchQuran(input.value), 500);
+  });
+})();
+</script>
+{% endblock %}
