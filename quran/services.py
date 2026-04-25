@@ -9,6 +9,8 @@ from django.core.cache import cache
 from django.utils.html import escape
 import requests
 
+from users.engagement import record_daily_reading
+
 from .models import QuranReadingProgress, ReadSurah
 
 ARABIC_DIACRITICS_PATTERN = re.compile(r"[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]")
@@ -91,7 +93,7 @@ def mark_surah_read(user, surah_number: int, surah_name: str, surah_name_ar: str
     progress = get_or_create_reading_progress(user)
     if not progress:
         return None
-    return ReadSurah.objects.get_or_create(
+    result = ReadSurah.objects.get_or_create(
         progress=progress,
         surah_number=surah_number,
         defaults={
@@ -100,6 +102,9 @@ def mark_surah_read(user, surah_number: int, surah_name: str, surah_name_ar: str
             "verses_count": verses_count,
         },
     )
+    if result[1]:
+        record_daily_reading(user, verses_read=verses_count, surah_number=surah_number)
+    return result
 
 
 def unmark_surah_read(user, surah_number: int):

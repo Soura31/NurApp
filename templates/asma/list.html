@@ -1,16 +1,45 @@
-﻿{% extends 'base.html' %}
-{% block title %}99 Noms d'Allah{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Asma ul Husna | NurCoran{% endblock %}
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
-  <h1 class="font-amiri text-6xl text-[#c9a84c] text-center" dir="rtl" lang="ar">أَسْمَاءُ اللَّهِ الْحُسْنَى</h1>
-  <p class="text-center text-[#8b949e]">Les plus beaux noms d'Allah</p>
+  <div class="text-center max-w-3xl mx-auto">
+    <p class="font-amiri text-6xl text-[#c9a84c] text-center" dir="rtl" lang="ar">أَسْمَاءُ اللَّهِ الْحُسْنَى</p>
+    <h1 class="font-cinzel text-4xl text-white mt-4">99 noms d'Allah</h1>
+    <p class="text-[#8b949e] mt-3">Grille complete avec traduction, numero, explication, hadith, audio et tracker de memorisation.</p>
+  </div>
+
+  {% if daily_name %}
+  <div class="mt-8 rounded-3xl border border-[#c9a84c]/25 bg-[#0d1117] p-6 max-w-3xl mx-auto">
+    <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Nom du jour</p>
+    <p class="font-amiri text-5xl text-white mt-3" dir="rtl" lang="ar">{{ daily_name.name_arabic }}</p>
+    <p class="text-[#c9a84c] mt-2 text-xl">{{ daily_name.transliteration }}</p>
+    <p class="text-[#dfe7ef] mt-3">{{ daily_name.meaning }}</p>
+  </div>
+  {% endif %}
+
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8">
     {% for n in names %}
-      <article class="group rounded-2xl p-5 text-center premium-lift" style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(26,107,74,.08));border:1px solid rgba(201,168,76,.2)">
-        <p class="text-[#c9a84c]/60 text-xs">{{ n.number }}</p>
-        <p class="font-amiri text-3xl text-white" dir="rtl" lang="ar">{{ n.name_arabic }}</p>
-        <p class="text-[#c9a84c]">{{ n.transliteration }}</p>
-        <p class="text-[#8b949e] text-sm">{{ n.meaning }}</p>
+      <article class="group rounded-3xl p-5 bg-[#161b22] border border-[#c9a84c]/20 premium-lift">
+        <div class="flex items-center justify-between gap-3">
+          <p class="text-[#c9a84c]/70 text-xs">#{{ n.number }}</p>
+          {% if user.is_authenticated %}
+          <form method="post" action="{% url 'asma:toggle_memorized' n.id %}">
+            {% csrf_token %}
+            <button class="h-10 min-w-10 px-3 rounded-full border {% if n.id in learned_ids %}border-[#c9a84c] bg-[#c9a84c]/10 text-[#f0c060]{% else %}border-white/10 text-white/70{% endif %}">
+              <i class="fa-solid fa-bookmark"></i>
+            </button>
+          </form>
+          {% endif %}
+        </div>
+        <p class="font-amiri text-4xl text-white mt-4" dir="rtl" lang="ar">{{ n.name_arabic }}</p>
+        <p class="text-[#c9a84c] mt-2">{{ n.transliteration }}</p>
+        <p class="text-[#8b949e] text-sm mt-2">{{ n.meaning }}</p>
+        <p class="text-[#dfe7ef] text-sm mt-4">{{ n.explanation|truncatechars:120 }}</p>
+        <div class="mt-4 flex flex-wrap gap-2 text-xs">
+          <span class="px-3 py-2 rounded-full bg-[#0d1117] border border-[#c9a84c]/15 text-[#f0c060]">Hadith</span>
+          <span class="px-3 py-2 rounded-full bg-[#0d1117] border border-[#c9a84c]/15 text-[#f0c060]">Audio</span>
+          <span class="px-3 py-2 rounded-full bg-[#0d1117] border border-[#c9a84c]/15 text-[#f0c060]">Memoriser</span>
+        </div>
       </article>
     {% endfor %}
   </div>

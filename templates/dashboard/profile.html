@@ -1,10 +1,19 @@
-﻿{% extends 'dashboard/base.html' %}
-{% block title %}Profil{% endblock %}
+{% extends 'dashboard/base.html' %}
+{% block title %}Profil | NurCoran{% endblock %}
 {% block dashboard_content %}
-<h1 class="text-3xl font-bold mb-6">Profil</h1>
-<form method="post" enctype="multipart/form-data" class="p-6 rounded-xl bg-[#0f1923] border border-white/10 space-y-3">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button class="bg-gold text-black px-4 py-2 rounded">Mettre a jour</button>
-</form>
+<section data-aos="fade-up">
+  <h1 class="font-cinzel text-4xl text-white mb-6">Mon profil</h1>
+  <form method="post" enctype="multipart/form-data" class="rounded-3xl border border-[#c9a84c]/20 bg-[#0d1117] p-6 space-y-4">
+    {% csrf_token %}
+    {% for field in form %}
+    <div>
+      <label class="block text-[#c9a84c] text-sm mb-2">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<p class="text-[#8b949e] text-xs mt-1">{{ field.help_text }}</p>{% endif %}
+      {% for error in field.errors %}<p class="text-red-300 text-xs mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    {% endfor %}
+    <button class="px-5 py-3 rounded-2xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Mettre a jour</button>
+  </form>
+</section>
 {% endblock %}

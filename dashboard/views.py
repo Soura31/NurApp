@@ -1,16 +1,18 @@
-﻿from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Sum
-from django.views.generic import ListView, TemplateView, UpdateView
 from django.urls import reverse_lazy
+from django.views.generic import ListView, TemplateView, UpdateView
 
 from community.models import ForumPost
+from hadith.models import Hadith
 from payments.models import Payment
 from quran.models import Bookmark, Favorite, RecitationAttempt
 from quran.services import get_progress_snapshot
 from subscriptions.models import Plan
 from tasbih.models import TasbihSession
+from users.engagement import build_month_streak_calendar, get_pending_notifications, get_profile_summary
 from users.forms import ProfileForm
-from hadith.models import Hadith
+from users.models import UserGoal
 
 
 class DashboardHomeView(LoginRequiredMixin, TemplateView):
@@ -20,13 +22,21 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         progress_snapshot = get_progress_snapshot(user)
+        summary = get_profile_summary(user)
         context["stats"] = {
             "versets_lus": Favorite.objects.filter(user=user).count(),
             "prieres_suivies": 0,
             "tasbih_total": TasbihSession.objects.filter(user=user).aggregate(total=Sum("count")).get("total") or 0,
         }
         context["quran_progress"] = progress_snapshot
+        context["chapter_grid"] = progress_snapshot["chapters"]
+        context["completed_surah_ids"] = set(progress_snapshot["read_surah_ids"])
         context["recent_recitations"] = RecitationAttempt.objects.filter(user=user)[:5]
+        context["goals"] = UserGoal.objects.filter(user=user).order_by("-is_active", "-updated_at")[:3]
+        context["goal_slots_remaining"] = max(0, 3 - UserGoal.objects.filter(user=user, is_active=True).count())
+        context["streak_calendar"] = build_month_streak_calendar(user)
+        context["summary"] = summary
+        context["recent_notifications"] = get_pending_notifications(user)
         return context
 
 

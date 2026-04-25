@@ -4,53 +4,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="NurCoran — application islamique premium">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="NurCoran">
-  <meta name="application-name" content="NurCoran">
+  <meta name="description" content="NurCoran - application islamique premium">
   <meta name="theme-color" content="#080c10">
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" sizes="180x180" href="/static/images/icon-ios.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="/static/images/icon-ipad.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/static/images/icon-android.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/static/images/icon-desktop.png">
-  <link rel="shortcut icon" href="/static/images/icon-ios.png">
   <title>{% block title %}NurCoran{% endblock %}</title>
-  <script>
-    (function () {
-      try {
-        const saved = localStorage.getItem('nur-theme');
-        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-        const theme = saved || (prefersLight ? 'light' : 'dark');
-        document.documentElement.setAttribute('data-theme', theme);
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-    })();
-  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/nurapp.css' %}?v=20260305b">
-  <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=20260305b">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/nurapp.css' %}?v=20260425a">
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=20260425a">
   {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-[var(--nur-bg-deep)] text-[var(--nur-text-main)]" data-authenticated="{% if user.is_authenticated %}1{% endif %}">
-  <div id="page-loader" class="fixed inset-0 z-[100] bg-[var(--nur-bg-deep)] flex items-center justify-center">
+<body class="bg-[#080c10] text-white {% if user.is_authenticated and user.notification_preferences.high_contrast %}high-contrast{% endif %}">
+  <div class="fixed inset-0 pointer-events-none opacity-20" style="background-image:radial-gradient(circle at 20% 20%, rgba(201,168,76,.18), transparent 32%), radial-gradient(circle at 80% 10%, rgba(26,107,74,.22), transparent 26%), linear-gradient(135deg, rgba(201,168,76,.05) 1px, transparent 1px), linear-gradient(45deg, rgba(201,168,76,.05) 1px, transparent 1px); background-size:auto, auto, 28px 28px, 28px 28px;"></div>
+  <div id="page-loader" class="fixed inset-0 z-[100] bg-[#080c10] flex items-center justify-center">
     <div class="star-loader"></div>
   </div>
 
   {% include 'includes/navbar.html' %}
 
-  <main class="pt-24 min-h-screen relative z-10">
+  <main class="pt-24 pb-24 lg:pb-12 min-h-screen relative z-10">
     {% block content %}{% endblock %}
   </main>
 
@@ -62,20 +44,27 @@
     {% for message in messages %}<span data-level="{{ message.tags|default:'info' }}">{{ message }}</span>{% endfor %}
   </div>
   {% endif %}
+  {% if pending_notifications %}
+  <div class="hidden" id="pending-notifications">
+    {% for item in pending_notifications %}
+    <span data-title="{{ item.title }}" data-body="{{ item.body }}" data-url="{{ item.url }}" data-type="{{ item.notification_type }}"></span>
+    {% endfor %}
+  </div>
+  {% endif %}
 
   <div class="fixed bottom-6 right-4 z-[70]">
-    <button id="assistant-fab" type="button" class="h-14 w-14 rounded-full border border-[#c9a84c]/45 text-[#080c10] shadow-[0_0_35px_rgba(201,168,76,.28)] flex items-center justify-center" style="background:var(--nur-gold-gradient)">
-      <i class="fa-solid fa-moon text-lg"></i>
+    <button id="assistant-fab" type="button" class="h-14 w-14 rounded-full border border-[#c9a84c]/45 text-[#080c10] shadow-[0_0_35px_rgba(201,168,76,.28)] flex items-center justify-center" style="background:var(--nur-gold-gradient)" aria-label="Ouvrir l'assistant islamique">
+      <i class="fa-solid fa-sparkles text-lg"></i>
     </button>
   </div>
 
   <div id="assistant-widget" class="hidden fixed bottom-24 right-4 z-[75] w-[calc(100vw-2rem)] max-w-md rounded-[1.75rem] border border-[#c9a84c]/20 bg-[#0d1117]/95 backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(0,0,0,.35)]">
     <div class="px-5 py-4 border-b border-[#c9a84c]/15 flex items-center justify-between gap-4">
       <div>
-        <p class="text-[#f0c060] uppercase tracking-[0.35em] text-[10px]">Assistant IA</p>
+        <p class="text-[#f0c060] uppercase tracking-[0.35em] text-[10px]">Assistant NurCoran</p>
         <p class="text-white font-semibold mt-1">Questions islamiques</p>
       </div>
-      <button id="assistant-widget-close" type="button" class="h-9 w-9 rounded-full border border-[#c9a84c]/20 text-[#c9a84c]">×</button>
+      <button id="assistant-widget-close" type="button" class="h-9 w-9 rounded-full border border-[#c9a84c]/20 text-[#c9a84c]">x</button>
     </div>
     <div id="assistant-widget-messages" class="p-4 space-y-3 max-h-[420px] overflow-y-auto">
       {% for item in assistant_history %}
@@ -93,116 +82,84 @@
       {% endfor %}
     </div>
     <form id="assistant-widget-form" class="border-t border-[#c9a84c]/15 p-4 flex gap-3">
-      <input id="assistant-widget-input" type="text" class="flex-1 rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white" placeholder="Posez votre question...">
+      <input id="assistant-widget-input" type="text" class="flex-1 rounded-xl bg-[#161b22] border border-[#c9a84c]/20 px-4 py-3 text-white" placeholder="Posez votre question..." aria-label="Message a l'assistant">
       <button class="px-4 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Envoyer</button>
     </form>
   </div>
 
-  <div id="install-banner"
-       class="hidden fixed bottom-24 left-4 right-4 z-50 rounded-2xl p-4 flex items-center justify-between"
-       style="background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); backdrop-filter: blur(20px)">
-    <div class="flex items-center gap-3">
-      <img src="/static/images/icon-192.png" class="w-12 h-12 rounded-xl" alt="NurCoran">
-      <div>
-        <p class="text-white font-bold text-sm">Installer NurCoran</p>
-        <p class="text-gray-400 text-xs">Ajouter a l'ecran d'accueil</p>
-      </div>
+  <nav class="mobile-bottom-nav fixed bottom-0 inset-x-0 z-[65] lg:hidden">
+    <div class="grid grid-cols-5">
+      <a href="/" class="flex flex-col items-center justify-center gap-1 py-3 text-xs text-[var(--nur-text-muted)]" aria-label="Accueil">
+        <i class="fa-solid fa-house text-[#c9a84c]"></i>
+        <span>Accueil</span>
+      </a>
+      <a href="/quran/" class="flex flex-col items-center justify-center gap-1 py-3 text-xs text-[var(--nur-text-muted)]" aria-label="Coran">
+        <i class="fa-solid fa-book-quran text-[#c9a84c]"></i>
+        <span>Coran</span>
+      </a>
+      <a href="/prayer-times/" class="flex flex-col items-center justify-center gap-1 py-3 text-xs text-[var(--nur-text-muted)]" aria-label="Prieres">
+        <i class="fa-solid fa-clock text-[#c9a84c]"></i>
+        <span>Prieres</span>
+      </a>
+      <a href="/community/" class="flex flex-col items-center justify-center gap-1 py-3 text-xs text-[var(--nur-text-muted)]" aria-label="Ummah feed">
+        <i class="fa-solid fa-users text-[#c9a84c]"></i>
+        <span>Feed</span>
+      </a>
+      <a href="/dashboard/" class="flex flex-col items-center justify-center gap-1 py-3 text-xs text-[var(--nur-text-muted)]" aria-label="Dashboard">
+        <i class="fa-solid fa-chart-line text-[#c9a84c]"></i>
+        <span>Dashboard</span>
+      </a>
     </div>
+  </nav>
 
-    <div class="flex gap-2">
-      <button id="install-btn"
-              class="px-4 py-2 rounded-xl text-sm font-bold text-[#080c10]"
-              style="background: linear-gradient(135deg, #c9a84c, #f0c060)">
-        Installer
-      </button>
-      <button id="dismiss-btn" class="px-3 py-2 rounded-xl text-sm text-gray-400">
-        x
-      </button>
-    </div>
-  </div>
-
-  <script src="{% static 'js/nurapp.js' %}?v=20260305b"></script>
-  <script src="{% static 'js/main.js' %}?v=20260418a"></script>
+  <script src="{% static 'js/nurapp.js' %}?v=20260425a"></script>
+  <script src="{% static 'js/main.js' %}?v=20260425a"></script>
   {% if global_verse_of_day %}{{ global_verse_of_day|json_script:"global-verse-of-day-data" }}{% endif %}
-  <script>
-    (function () {
-      function applyTheme(theme) {
-        const html = document.documentElement;
-        const body = document.body;
-        const isLight = theme === 'light';
-        html.setAttribute('data-theme', theme);
-        html.style.colorScheme = isLight ? 'light' : 'dark';
-        if (body) {
-          body.classList.toggle('theme-light', isLight);
-          body.classList.toggle('theme-dark', !isLight);
-        }
-        try { localStorage.setItem('nur-theme', theme); } catch (e) {}
-
-        const desktopIcon = document.getElementById('theme-toggle-icon');
-        const mobileIcon = document.getElementById('theme-toggle-mobile-icon');
-        const mobileText = document.getElementById('theme-toggle-mobile-text');
-        const desktopBtn = document.getElementById('theme-toggle');
-
-        if (desktopIcon) desktopIcon.className = isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-        if (mobileIcon) mobileIcon.className = isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-        if (mobileText) mobileText.textContent = isLight ? 'Mode nuit' : 'Mode jour';
-        if (desktopBtn) desktopBtn.setAttribute('aria-label', isLight ? 'Activer le mode nuit' : 'Activer le mode jour');
-      }
-
-      window.toggleTheme = function toggleTheme() {
-        const current = document.documentElement.getAttribute('data-theme') || 'dark';
-        applyTheme(current === 'light' ? 'dark' : 'light');
-      };
-
-      document.addEventListener('DOMContentLoaded', function () {
-        let saved = null;
-        try { saved = localStorage.getItem('nur-theme'); } catch (e) {}
-        applyTheme(saved || document.documentElement.getAttribute('data-theme') || 'dark');
-      });
-    })();
-  </script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/static/js/service-worker.js")
-          .then((reg) => {
-            console.log("NurCoran PWA enregistree", reg.scope);
-          })
-          .catch((err) => {
-            console.log("Erreur PWA:", err);
-          });
+        navigator.serviceWorker.register("/static/js/service-worker.js");
       });
     }
   </script>
   <script>
-    let deferredPrompt;
-
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const banner = document.getElementById("install-banner");
-      if (banner) banner.classList.remove("hidden");
-    });
-
-    document.getElementById("install-btn")?.addEventListener("click", async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      document.getElementById("install-banner")?.classList.add("hidden");
-    });
-
-    document.getElementById("dismiss-btn")?.addEventListener("click", () => {
-      document.getElementById("install-banner")?.classList.add("hidden");
-    });
-
-    window.addEventListener("appinstalled", () => {
-      console.log("NurCoran PWA installee avec succes");
-    });
-  </script>
-  <script>
     (function () {
+      function getCsrf() {
+        return document.cookie.split('; ').find((row) => row.startsWith('csrftoken='))?.split('=')[1] || '';
+      }
+
+      function showToast(text, level) {
+        const container = document.getElementById('toast-container');
+        if (!container || !text) return;
+        const node = document.createElement('div');
+        node.className = 'toast rounded-2xl border px-4 py-3 text-sm shadow-lg ' + (level === 'error'
+          ? 'border-red-400/30 bg-red-500/10 text-red-100'
+          : level === 'warning'
+            ? 'border-[#c9a84c]/35 bg-[#c9a84c]/10 text-[#f6e5b9]'
+            : 'border-[#1a6b4a]/35 bg-[#1a6b4a]/15 text-[#d9f8ea]');
+        node.textContent = text;
+        container.appendChild(node);
+        setTimeout(() => node.remove(), 5000);
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('#django-messages span').forEach((item) => {
+          showToast(item.textContent, item.dataset.level);
+        });
+
+        document.querySelectorAll('#pending-notifications span').forEach(async (item) => {
+          showToast(item.dataset.title + ' - ' + item.dataset.body, 'info');
+          if ('Notification' in window && Notification.permission === 'granted') {
+            const registration = await navigator.serviceWorker.getRegistration();
+            registration?.showNotification(item.dataset.title, {
+              body: item.dataset.body,
+              icon: '/static/images/icon-192.png',
+              data: { url: item.dataset.url || '/' }
+            });
+          }
+        });
+      });
+
       const fab = document.getElementById('assistant-fab');
       const widget = document.getElementById('assistant-widget');
       const closeBtn = document.getElementById('assistant-widget-close');
@@ -211,15 +168,13 @@
       const messages = document.getElementById('assistant-widget-messages');
       if (!fab || !widget || !form || !input || !messages) return;
 
-      function getCsrf() {
-        return document.cookie.split('; ').find((row) => row.startsWith('csrftoken='))?.split('=')[1] || '';
-      }
-
       function appendMessage(role, text) {
         const wrapper = document.createElement('div');
-        wrapper.className = `flex ${role === 'assistant' ? 'justify-start' : 'justify-end'}`;
+        wrapper.className = 'flex ' + (role === 'assistant' ? 'justify-start' : 'justify-end');
         const bubble = document.createElement('div');
-        bubble.className = `max-w-[85%] rounded-2xl px-4 py-3 ${role === 'assistant' ? 'bg-[#c9a84c]/12 border border-[#c9a84c]/20 text-[#f4ead0]' : 'bg-[#1a6b4a]/30 border border-[#1a6b4a]/35 text-white'}`;
+        bubble.className = 'max-w-[85%] rounded-2xl px-4 py-3 ' + (role === 'assistant'
+          ? 'bg-[#c9a84c]/12 border border-[#c9a84c]/20 text-[#f4ead0]'
+          : 'bg-[#1a6b4a]/30 border border-[#1a6b4a]/35 text-white');
         bubble.innerHTML = String(text).replace(/\n/g, '<br>');
         wrapper.appendChild(bubble);
         messages.appendChild(wrapper);
@@ -228,7 +183,6 @@
 
       fab.addEventListener('click', () => widget.classList.toggle('hidden'));
       closeBtn?.addEventListener('click', () => widget.classList.add('hidden'));
-
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
         const value = input.value.trim();
@@ -253,6 +207,9 @@
           appendMessage('assistant', "L'assistant est temporairement indisponible.");
         }
       });
+
+      document.getElementById('page-loader')?.classList.add('opacity-0');
+      setTimeout(() => document.getElementById('page-loader')?.remove(), 500);
     })();
   </script>
   <script>AOS.init({duration:800, once:true});</script>

@@ -1,10 +1,11 @@
-﻿from django.urls import path
+from django.urls import path
 
 from .views import (
     CategoryPostsView,
     CommunityHomeView,
     ForumPostCreateView,
     ForumPostDetailView,
+    ForumPostLikeView,
     ForumPostReportView,
     ForumReplyCreateView,
 )
@@ -17,5 +18,6 @@ urlpatterns = [
     path("post/<int:pk>/", ForumPostDetailView.as_view(), name="post_detail"),
     path("post/<int:post_id>/reply/", ForumReplyCreateView.as_view(), name="reply_create"),
     path("post/<int:post_id>/report/", ForumPostReportView.as_view(), name="report"),
+    path("post/<int:post_id>/like/", ForumPostLikeView.as_view(), name="like"),
     path("category/<slug:slug>/", CategoryPostsView.as_view(), name="category_posts"),
 ]

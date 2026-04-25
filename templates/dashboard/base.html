@@ -1,38 +1,23 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% block content %}
-<div class="grid lg:grid-cols-5 gap-6">
-  <!-- Sidebar -->
-  <aside class="lg:col-span-1">
-    <div class="glass-static p-4 sticky top-28">
-      <h2 class="text-gold font-bold text-sm uppercase tracking-wider mb-4 px-2">Dashboard</h2>
-      <nav class="space-y-1">
-        <a class="sidebar-link" href="{% url 'dashboard:home' %}">
-          <i data-lucide="home" class="w-4 h-4"></i> Accueil
-        </a>
-        <a class="sidebar-link" href="{% url 'dashboard:subscription' %}">
-          <i data-lucide="crown" class="w-4 h-4"></i> Mon abonnement
-        </a>
-        <a class="sidebar-link" href="{% url 'dashboard:favorites' %}">
-          <i data-lucide="heart" class="w-4 h-4"></i> Mes favoris
-        </a>
-        <a class="sidebar-link" href="{% url 'dashboard:bookmarks' %}">
-          <i data-lucide="bookmark" class="w-4 h-4"></i> Mes signets
-        </a>
-        <a class="sidebar-link" href="{% url 'dashboard:invoices' %}">
-          <i data-lucide="receipt" class="w-4 h-4"></i> Factures
-        </a>
-        <a class="sidebar-link" href="{% url 'dashboard:profile' %}">
-          <i data-lucide="user" class="w-4 h-4"></i> Profil
-        </a>
-        <div class="divider-gold"></div>
-        <a class="sidebar-link" href="/admin-panel/">
-          <i data-lucide="shield" class="w-4 h-4"></i> Admin Panel
-        </a>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid lg:grid-cols-[280px,1fr] gap-6">
+  <aside>
+    <div class="rounded-3xl border border-[#c9a84c]/20 bg-[#0d1117] p-5 sticky top-28">
+      <h2 class="font-cinzel text-2xl nur-gold-text">Dashboard</h2>
+      <p class="text-[#8b949e] text-sm mt-2">Suivi personnel NurCoran</p>
+      <nav class="mt-6 space-y-2 text-sm">
+        <a class="block rounded-2xl px-4 py-3 border border-white/5 text-white hover:border-[#c9a84c]/35 hover:text-[#c9a84c]" href="{% url 'dashboard:home' %}">Accueil</a>
+        <a class="block rounded-2xl px-4 py-3 border border-white/5 text-white hover:border-[#c9a84c]/35 hover:text-[#c9a84c]" href="{% url 'dashboard:subscription' %}">Abonnement</a>
+        <a class="block rounded-2xl px-4 py-3 border border-white/5 text-white hover:border-[#c9a84c]/35 hover:text-[#c9a84c]" href="{% url 'dashboard:favorites' %}">Favoris</a>
+        <a class="block rounded-2xl px-4 py-3 border border-white/5 text-white hover:border-[#c9a84c]/35 hover:text-[#c9a84c]" href="{% url 'dashboard:bookmarks' %}">Signets</a>
+        <a class="block rounded-2xl px-4 py-3 border border-white/5 text-white hover:border-[#c9a84c]/35 hover:text-[#c9a84c]" href="{% url 'dashboard:invoices' %}">Factures</a>
+        <a class="block rounded-2xl px-4 py-3 border border-white/5 text-white hover:border-[#c9a84c]/35 hover:text-[#c9a84c]" href="{% url 'dashboard:profile' %}">Profil</a>
+        <a class="block rounded-2xl px-4 py-3 border border-white/5 text-white hover:border-[#c9a84c]/35 hover:text-[#c9a84c]" href="/badges/">Badges</a>
+        <a class="block rounded-2xl px-4 py-3 border border-white/5 text-white hover:border-[#c9a84c]/35 hover:text-[#c9a84c]" href="/parametres/notifications/">Notifications</a>
       </nav>
     </div>
   </aside>
-  <!-- Content -->
-  <section class="lg:col-span-4">
+  <section>
     {% block dashboard_content %}{% endblock %}
   </section>
 </div>

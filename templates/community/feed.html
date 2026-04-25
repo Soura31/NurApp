@@ -1,39 +1,101 @@
-﻿{% extends 'base.html' %}
-{% block title %}Communaute{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Ummah Feed | NurCoran{% endblock %}
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
   <div class="flex flex-wrap items-center justify-between gap-4">
-    <h1 class="font-cinzel text-4xl text-white">Communaute</h1>
-    <a href="#new-post" class="px-5 py-3 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Nouveau post</a>
+    <div>
+      <h1 class="font-cinzel text-4xl text-white">Ummah Feed</h1>
+      <p class="text-[#8b949e] mt-2">Versets, duas, hadiths et questions dans un feed social islamique.</p>
+    </div>
+    <a href="#new-post" class="px-5 py-3 rounded-2xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Publier</a>
   </div>
-  <div class="grid lg:grid-cols-[280px,1fr] gap-6 mt-6">
-    <aside class="rounded-2xl bg-[#161b22] border border-[#c9a84c]/20 p-4">
-      <p class="text-[#f0c060] font-semibold mb-3">Categories</p>
+
+  <div class="grid lg:grid-cols-[260px,1fr,300px] gap-6 mt-6">
+    <aside class="rounded-3xl bg-[#0d1117] border border-[#c9a84c]/20 p-5">
+      <p class="text-[#f0c060] font-semibold mb-4">Filtres</p>
+      <div class="space-y-2 text-sm">
+        <a href="/community/?filter=trending" class="block rounded-2xl border border-white/5 px-4 py-3 text-white hover:border-[#c9a84c]/35">Tendances</a>
+        <a href="/community/?filter=recent" class="block rounded-2xl border border-white/5 px-4 py-3 text-white hover:border-[#c9a84c]/35">Recent</a>
+        <a href="/community/?filter=verses" class="block rounded-2xl border border-white/5 px-4 py-3 text-white hover:border-[#c9a84c]/35">Versets</a>
+        <a href="/community/?filter=duas" class="block rounded-2xl border border-white/5 px-4 py-3 text-white hover:border-[#c9a84c]/35">Duas</a>
+        <a href="/community/?filter=questions" class="block rounded-2xl border border-white/5 px-4 py-3 text-white hover:border-[#c9a84c]/35">Questions</a>
+      </div>
+      <p class="text-[#f0c060] font-semibold mt-6 mb-3">Categories</p>
       <div class="space-y-2">
         {% for c in categories %}
-        <a href="/community/category/{{ c.slug }}/" class="block p-3 rounded-xl border border-white/5 hover:border-[#c9a84c]/30 text-[#e6edf3]">{{ c.name }} {% if c.is_premium %}<span class="text-xs text-[#c9a84c]">Premium</span>{% endif %}</a>
+        <a href="/community/category/{{ c.slug }}/" class="block rounded-2xl border border-white/5 px-4 py-3 text-white hover:border-[#c9a84c]/35">{{ c.name }}</a>
         {% endfor %}
       </div>
     </aside>
 
-    <section>
-      {% for c in categories %}
-      <article class="rounded-2xl p-5 mb-4" style="background:rgba(201,168,76,.02);border:1px solid rgba(255,255,255,.05)">
-        <div class="flex items-center justify-between"><h2 class="text-white font-semibold">{{ c.name }}</h2><a href="/community/category/{{ c.slug }}/" class="text-[#c9a84c] text-sm">Voir</a></div>
-        <p class="text-[#8b949e] text-sm mt-2">{{ c.description|default:'Espace d echange spirituel et d entraide.' }}</p>
-      </article>
-      {% endfor %}
-
+    <section class="space-y-5">
       {% if user.is_authenticated %}
-      <form id="new-post" method="post" action="/community/post/new/" class="rounded-2xl p-5 bg-[#161b22] border border-[#c9a84c]/20 mt-6">{% csrf_token %}
-        <p class="text-[#f0c060] font-semibold mb-3">Creer un post</p>
-        <select name="category" class="w-full rounded-xl bg-[#0d1117] border border-[#c9a84c]/20 px-3 py-2 text-white mb-3">{% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select>
-        <input name="title" placeholder="Titre" class="w-full rounded-xl bg-[#0d1117] border border-[#c9a84c]/20 px-3 py-2 text-white mb-3">
-        <textarea name="content" rows="4" placeholder="Votre message" class="w-full rounded-xl bg-[#0d1117] border border-[#c9a84c]/20 px-3 py-2 text-white"></textarea>
-        <button class="mt-3 px-5 py-2 rounded-xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Publier</button>
+      <form id="new-post" method="post" action="/community/post/new/" class="rounded-3xl p-5 bg-[#0d1117] border border-[#c9a84c]/20">
+        {% csrf_token %}
+        <div class="grid md:grid-cols-2 gap-3">
+          <select name="category" class="rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white">
+            {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+          </select>
+          <select name="post_type" class="rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white">
+            <option value="verse">Verset + reflexion</option>
+            <option value="dua">Dua</option>
+            <option value="hadith">Hadith</option>
+            <option value="question">Question</option>
+          </select>
+        </div>
+        <input name="title" placeholder="Titre de votre publication" class="w-full rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white mt-3">
+        <input name="verse_reference" placeholder="Reference optionnelle (ex: 2:255)" class="w-full rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white mt-3">
+        <textarea name="content" rows="4" placeholder="Votre contenu, reflexion ou question..." class="w-full rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white mt-3"></textarea>
+        <button class="mt-4 px-5 py-3 rounded-2xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Publier sur le feed</button>
       </form>
       {% endif %}
+
+      {% for post in posts %}
+      <article class="rounded-3xl border border-[#c9a84c]/20 bg-[#161b22] p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-[#f0c060]">
+              <span>{{ post.get_post_type_display }}</span>
+              <span>•</span>
+              <span>{{ post.category.name }}</span>
+            </div>
+            <h2 class="text-white text-2xl font-semibold mt-3"><a href="/community/post/{{ post.id }}/">{{ post.title }}</a></h2>
+            {% if post.verse_reference %}<p class="text-[#c9a84c] text-sm mt-2">{{ post.verse_reference }}</p>{% endif %}
+          </div>
+          <a href="/profil/{{ post.author.username }}/" class="text-right">
+            <p class="text-white font-semibold">{{ post.author.username }}</p>
+            <p class="text-[#8b949e] text-sm">{{ post.created_at|date:'d/m H:i' }}</p>
+          </a>
+        </div>
+        <p class="text-[#dfe7ef] mt-4 leading-7">{{ post.content|truncatewords:50 }}</p>
+        <div class="mt-5 flex flex-wrap items-center gap-3 text-sm">
+          <form method="post" action="/community/post/{{ post.id }}/like/">{% csrf_token %}
+            <button class="px-4 py-2 rounded-full border border-[#c9a84c]/35 text-[#c9a84c] hover:bg-[#c9a84c]/10">
+              <i class="fa-solid fa-hands-clapping"></i> Masha'Allah ({{ post.likes_count }})
+            </button>
+          </form>
+          <a href="/community/post/{{ post.id }}/" class="px-4 py-2 rounded-full border border-white/10 text-white/75 hover:border-[#c9a84c]/35">Commentaires ({{ post.replies.count }})</a>
+          <span class="px-4 py-2 rounded-full border border-white/10 text-white/60">Vues {{ post.views_count }}</span>
+        </div>
+      </article>
+      {% empty %}
+      <div class="rounded-3xl border border-[#c9a84c]/20 bg-[#161b22] p-6">
+        <p class="text-[#8b949e]">Aucune publication pour ce filtre.</p>
+      </div>
+      {% endfor %}
     </section>
+
+    <aside class="rounded-3xl bg-[#0d1117] border border-[#c9a84c]/20 p-5">
+      <p class="text-[#f0c060] font-semibold mb-4">Top du moment</p>
+      <div class="space-y-3">
+        {% for post in top_posts %}
+        <a href="/community/post/{{ post.id }}/" class="block rounded-2xl border border-white/5 bg-[#161b22] p-4 hover:border-[#c9a84c]/35">
+          <p class="text-white font-semibold">{{ post.title|truncatechars:48 }}</p>
+          <p class="text-[#8b949e] text-sm mt-2">{{ post.likes_count }} likes • {{ post.reply_total }} commentaires</p>
+        </a>
+        {% endfor %}
+      </div>
+    </aside>
   </div>
 </section>
 {% endblock %}

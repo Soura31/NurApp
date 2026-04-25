@@ -1,4 +1,4 @@
-﻿from datetime import datetime
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -9,7 +9,18 @@ from django.views import View
 from django.views.generic import TemplateView
 import requests
 
-from .models import PrayerNotificationSetting
+from .models import PrayerNotificationSetting, PrayerReminder
+
+
+PRAYER_NAMES = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha", "Tahajjud"]
+
+
+def ensure_prayer_reminders(user):
+    reminders = []
+    for prayer_name in PRAYER_NAMES:
+        reminder, _ = PrayerReminder.objects.get_or_create(user=user, prayer_name=prayer_name)
+        reminders.append(reminder)
+    return reminders
 
 
 class PrayerTimesView(TemplateView):
@@ -28,7 +39,7 @@ class PrayerTimesView(TemplateView):
             )
             response.raise_for_status()
             data = response.json().get("data", {})
-            cache.set(key, data, 3600)  # 1h
+            cache.set(key, data, 3600)
             return data
         except Exception:
             return {}
@@ -63,13 +74,13 @@ class PrayerTimesView(TemplateView):
 
         timings_data = self._timings(city, country)
         timings = timings_data.get("timings", {})
-
         context.update(
             {
                 "city": city,
                 "country": country,
                 "timings": {k: timings.get(k) for k in ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]},
                 "monthly_calendar": self._monthly(city, country),
+                "auto_location_enabled": True,
             }
         )
         return context
@@ -81,14 +92,20 @@ class QiblaView(TemplateView):
 
 class PrayerNotificationSettingsView(LoginRequiredMixin, View):
     def post(self, request):
-        obj, _ = PrayerNotificationSetting.objects.get_or_create(user=request.user)
-        obj.fajr = bool(request.POST.get("fajr"))
-        obj.dhuhr = bool(request.POST.get("dhuhr"))
-        obj.asr = bool(request.POST.get("asr"))
-        obj.maghrib = bool(request.POST.get("maghrib"))
-        obj.isha = bool(request.POST.get("isha"))
-        obj.city = request.POST.get("city", obj.city)
-        obj.country = request.POST.get("country", obj.country)
-        obj.save()
-        messages.success(request, "Preferences de notification mises a jour.")
-        return redirect("prayer:times")
+        setting, _ = PrayerNotificationSetting.objects.get_or_create(user=request.user)
+        setting.city = request.POST.get("city", setting.city)
+        setting.country = request.POST.get("country", setting.country)
+        for field in ["fajr", "dhuhr", "asr", "maghrib", "isha", "tahajjud"]:
+            setattr(setting, field, bool(request.POST.get(field)))
+        setting.save()
+
+        for prayer_name in PRAYER_NAMES:
+            reminder, _ = PrayerReminder.objects.get_or_create(user=request.user, prayer_name=prayer_name)
+            key = prayer_name.lower()
+            reminder.enabled = bool(request.POST.get(f"enabled_{key}"))
+            reminder.delay_minutes = min(30, max(0, int(request.POST.get(f"delay_{key}", reminder.delay_minutes or 0))))
+            reminder.sound = request.POST.get(f"sound_{key}", reminder.sound or "adhan")
+            reminder.save()
+
+        messages.success(request, "Parametres de rappel de prieres mis a jour.")
+        return redirect("users:notification_settings")

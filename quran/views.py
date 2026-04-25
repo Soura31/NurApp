@@ -35,10 +35,25 @@ ARABIC_DIGITS_TRANS = str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩")
 ALQURAN_API_BASE = "https://api.alquran.cloud/v1"
 FRENCH_SEARCH_EDITION = "fr.hamidullah"
 TRANSLITERATION_SEARCH_EDITION = "en.transliteration"
+ARABIC_EDITION = "quran-uthmani"
 TAFSIR_EDITIONS = {
     "ibn-kathir": {"label": "Ibn Kathir", "edition": "en.ibn-kathir"},
     "jalalayn": {"label": "Jalalayn", "edition": "en.jalalayn"},
 }
+
+
+def build_simple_explanation(translation_text: str, tafsir_text: str) -> str:
+    translation = strip_html(translation_text)
+    tafsir = strip_html(tafsir_text)
+    if tafsir:
+        summary = tafsir.split(". ")[0].strip()
+        if summary and len(summary) > 220:
+            summary = summary[:217].rstrip() + "..."
+        if summary:
+            return f"En termes simples : {translation}\n\nPoint cle : {summary}"
+    if translation:
+        return f"En termes simples : {translation}"
+    return "Aucune explication simple n'est disponible pour ce verset."
 
 
 def to_arabic_digits(value):
@@ -266,9 +281,46 @@ class SurahDetailView(View):
             cache.set(verses_cache_key, verses, 21600)
         return verses
 
+    def _fetch_surah_support_editions(self, surah_number: int):
+        cache_key = f"surah_support_editions_{surah_number}"
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+
+        try:
+            response = requests.get(
+                f"{ALQURAN_API_BASE}/surah/{surah_number}/editions/{TRANSLITERATION_SEARCH_EDITION},{FRENCH_SEARCH_EDITION}",
+                timeout=12,
+            )
+            response.raise_for_status()
+            data = response.json().get("data", [])
+        except Exception:
+            return {}
+
+        transliteration_map = {}
+        translation_map = {}
+        for edition in data:
+            identifier = edition.get("edition", {}).get("identifier")
+            for ayah in edition.get("ayahs", []):
+                number_in_surah = ayah.get("numberInSurah")
+                if identifier == TRANSLITERATION_SEARCH_EDITION:
+                    transliteration_map[number_in_surah] = strip_html(ayah.get("text", ""))
+                elif identifier == FRENCH_SEARCH_EDITION:
+                    translation_map[number_in_surah] = strip_html(ayah.get("text", ""))
+
+        payload = {
+            "transliteration_map": transliteration_map,
+            "translation_map": translation_map,
+        }
+        cache.set(cache_key, payload, 21600)
+        return payload
+
     def get(self, request, surah_number: int):
         surah_data = self._fetch_surah_meta(surah_number)
         verses = self._fetch_surah_verses(surah_number)
+        support_editions = self._fetch_surah_support_editions(surah_number)
+        transliteration_map = support_editions.get("transliteration_map", {})
+        translation_map = support_editions.get("translation_map", {})
 
         if surah_number != 9 and verses:
             first_text = (verses[0].get("text_uthmani") or "").strip()
@@ -285,7 +337,11 @@ class SurahDetailView(View):
             verse["display_number"] = index
             verse["display_number_ar"] = to_arabic_digits(index)
             translations = verse.get("translations") or []
-            verse["translation_fr"] = strip_html(translations[0].get("text", "")) if translations else ""
+            verse_number = verse.get("verse_number")
+            verse["translation_fr"] = (
+                strip_html(translations[0].get("text", "")) if translations else translation_map.get(verse_number, "")
+            )
+            verse["transliteration"] = transliteration_map.get(verse_number, "")
             verse["tajweed_html"] = render_tajweed_html(verse.get("text_uthmani_tajweed", ""))
 
         progress_snapshot = get_progress_snapshot(request.user)
@@ -456,7 +512,7 @@ class TafsirApiView(View):
 
         try:
             response = requests.get(
-                f"{ALQURAN_API_BASE}/ayah/{reference}/editions/quran-uthmani,{config['edition']}",
+                f"{ALQURAN_API_BASE}/ayah/{reference}/editions/{ARABIC_EDITION},{config['edition']},{FRENCH_SEARCH_EDITION}",
                 timeout=12,
             )
             response.raise_for_status()
@@ -464,15 +520,69 @@ class TafsirApiView(View):
         except Exception:
             return JsonResponse({"error": "tafsir indisponible"}, status=502)
 
-        arabic = next((item for item in data if item.get("edition", {}).get("identifier") == "quran-uthmani"), {})
+        arabic = next((item for item in data if item.get("edition", {}).get("identifier") == ARABIC_EDITION), {})
         tafsir = next((item for item in data if item.get("edition", {}).get("identifier") == config["edition"]), {})
+        french = next((item for item in data if item.get("edition", {}).get("identifier") == FRENCH_SEARCH_EDITION), {})
+        translation_text = strip_html(french.get("text", ""))
+        tafsir_text = strip_html(tafsir.get("text", ""))
         payload = {
             "reference": reference,
             "label": config["label"],
             "arabic_text": strip_html(arabic.get("text", "")),
-            "tafsir_text": strip_html(tafsir.get("text", "")),
+            "translation_fr": translation_text,
+            "tafsir_text": tafsir_text,
+            "simple_text": build_simple_explanation(translation_text, tafsir_text),
         }
         cache.set(cache_key, payload, 43200)
+        return JsonResponse(payload)
+
+
+class WordByWordApiView(View):
+    def get(self, request):
+        reference = request.GET.get("reference", "").strip()
+        if not re.fullmatch(r"\d{1,3}:\d{1,3}", reference):
+            return JsonResponse({"error": "reference invalide"}, status=400)
+
+        cache_key = f"word_by_word_{reference}"
+        cached = cache.get(cache_key)
+        if cached:
+            return JsonResponse(cached)
+
+        try:
+            response = requests.get(
+                f"{settings.QURAN_API_BASE}/verses/by_key/{reference}",
+                params={
+                    "words": "true",
+                    "language": "fr",
+                    "word_fields": "text_uthmani,location,audio_url,char_type_name",
+                    "translation_fields": "text,language_name",
+                },
+                timeout=15,
+            )
+            response.raise_for_status()
+            verse = response.json().get("verse", {})
+        except Exception:
+            return JsonResponse({"error": "mot-a-mot indisponible"}, status=502)
+
+        words = []
+        for item in verse.get("words", []):
+            if item.get("char_type_name") != "word":
+                continue
+            translation = item.get("translation") or {}
+            transliteration = item.get("transliteration") or {}
+            words.append(
+                {
+                    "position": item.get("position") or item.get("location"),
+                    "text": item.get("text_uthmani", ""),
+                    "translation": translation.get("text", ""),
+                    "transliteration": transliteration.get("text", ""),
+                    "audio_url": item.get("audio_url", ""),
+                    "root": item.get("root", "") or "Racine indisponible",
+                }
+            )
+
+        payload = {"reference": reference, "words": words}
+        cache.set(cache_key, payload, 21600)
         return JsonResponse(payload)
 
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = "nurcoran-v3";
+const CACHE_NAME = "nurcoran-v4";
 const STATIC_ASSETS = [
   "/",
   "/offline/",
@@ -15,26 +15,24 @@ const STATIC_ASSETS = [
   "/calendar/",
   "/assistant/",
   "/hifz/",
+  "/duas/",
+  "/badges/",
+  "/community/",
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)));
 });
 
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) return response;
-
       return fetch(event.request)
         .then((networkResponse) => {
-          if (networkResponse.status === 200) {
+          if (networkResponse.status === 200 && event.request.method === "GET") {
             const responseClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
           }
           return networkResponse;
         })
@@ -51,14 +49,27 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+self.addEventListener("message", (event) => {
+  if (!event.data || event.data.type !== "SHOW_NOTIFICATION") return;
+  self.registration.showNotification(event.data.title || "NurCoran", {
+    body: event.data.body || "",
+    icon: "/static/images/icon-192.png",
+    data: { url: event.data.url || "/" },
+  });
+});
+
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
+  const targetUrl = event.notification.data?.url || "/";
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
-        if ("focus" in client) return client.focus();
+        if ("focus" in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
       }
-      if (clients.openWindow) return clients.openWindow("/");
+      if (clients.openWindow) return clients.openWindow(targetUrl);
       return null;
     })
   );

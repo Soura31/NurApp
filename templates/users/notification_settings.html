@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Parametres notifications | NurCoran{% endblock %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+  <h1 class="font-cinzel text-4xl text-white">Parametres de notifications</h1>
+  <p class="text-[#8b949e] mt-2">Rappels de prieres, lecture quotidienne, duas du matin et badges.</p>
+
+  <form method="post" class="mt-8 space-y-6">
+    {% csrf_token %}
+    <div class="rounded-3xl border border-[#c9a84c]/20 bg-[#0d1117] p-6">
+      <h2 class="font-cinzel text-2xl text-white">Notifications intelligentes</h2>
+      <div class="grid md:grid-cols-3 gap-4 mt-5">
+        <label class="rounded-2xl border border-white/10 bg-[#161b22] p-4 flex items-center justify-between gap-3"><span class="text-white">Verset du jour 7h</span><input type="checkbox" name="verse_of_day" {% if preferences.verse_of_day %}checked{% endif %}></label>
+        <label class="rounded-2xl border border-white/10 bg-[#161b22] p-4 flex items-center justify-between gap-3"><span class="text-white">Lecture quotidienne</span><input type="checkbox" name="daily_reading" {% if preferences.daily_reading %}checked{% endif %}></label>
+        <label class="rounded-2xl border border-white/10 bg-[#161b22] p-4 flex items-center justify-between gap-3"><span class="text-white">Danger de streak 20h</span><input type="checkbox" name="streak_danger" {% if preferences.streak_danger %}checked{% endif %}></label>
+        <label class="rounded-2xl border border-white/10 bg-[#161b22] p-4 flex items-center justify-between gap-3"><span class="text-white">Badge debloque</span><input type="checkbox" name="badge_unlocked" {% if preferences.badge_unlocked %}checked{% endif %}></label>
+        <label class="rounded-2xl border border-white/10 bg-[#161b22] p-4 flex items-center justify-between gap-3"><span class="text-white">Activite de groupe</span><input type="checkbox" name="group_activity" {% if preferences.group_activity %}checked{% endif %}></label>
+        <label class="rounded-2xl border border-white/10 bg-[#161b22] p-4 flex items-center justify-between gap-3"><span class="text-white">Reponses aux posts</span><input type="checkbox" name="post_replies" {% if preferences.post_replies %}checked{% endif %}></label>
+        <label class="rounded-2xl border border-white/10 bg-[#161b22] p-4 flex items-center justify-between gap-3"><span class="text-white">Dua du matin</span><input type="checkbox" name="morning_dua" {% if preferences.morning_dua %}checked{% endif %}></label>
+        <label class="rounded-2xl border border-white/10 bg-[#161b22] p-4 flex items-center justify-between gap-3"><span class="text-white">Push navigateur</span><input type="checkbox" name="push_enabled" {% if preferences.push_enabled %}checked{% endif %}></label>
+        <label class="rounded-2xl border border-white/10 bg-[#161b22] p-4 flex items-center justify-between gap-3"><span class="text-white">Contraste eleve</span><input type="checkbox" name="high_contrast" {% if preferences.high_contrast %}checked{% endif %}></label>
+      </div>
+      <div class="mt-5">
+        <label class="block text-[#c9a84c] text-sm mb-2">Heure de rappel lecture</label>
+        <input type="number" min="0" max="23" name="reminder_hour" value="{{ preferences.reminder_hour }}" class="w-32 rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white">
+      </div>
+    </div>
+
+    <div class="rounded-3xl border border-[#c9a84c]/20 bg-[#0d1117] p-6">
+      <h2 class="font-cinzel text-2xl text-white">Rappels de prieres</h2>
+      <p class="text-[#8b949e] mt-2">Cinq prieres et Tahajjud, delai 0-30 min, son adhan ou bip.</p>
+      <div class="space-y-4 mt-6">
+        {% for reminder in prayer_reminders %}
+        <div class="grid md:grid-cols-[1fr,auto,auto,auto] gap-3 rounded-2xl border border-white/10 bg-[#161b22] p-4 items-center">
+          <p class="text-white font-semibold">{{ reminder.prayer_name }}</p>
+          <label class="text-white/70 inline-flex items-center gap-2">
+            <input type="checkbox" name="enabled_{{ reminder.prayer_name|lower }}" {% if reminder.enabled %}checked{% endif %}>
+            Actif
+          </label>
+          <input type="number" min="0" max="30" name="delay_{{ reminder.prayer_name|lower }}" value="{{ reminder.delay_minutes }}" class="rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white">
+          <select name="sound_{{ reminder.prayer_name|lower }}" class="rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white">
+            <option value="adhan" {% if reminder.sound == 'adhan' %}selected{% endif %}>Adhan</option>
+            <option value="beep" {% if reminder.sound == 'beep' %}selected{% endif %}>Bip</option>
+          </select>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <button class="px-6 py-3 rounded-2xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Enregistrer</button>
+  </form>
+</section>
+{% endblock %}

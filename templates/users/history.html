@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Histoire islamique | NurCoran{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+  <div class="text-center max-w-3xl mx-auto">
+    <h1 class="font-cinzel text-4xl text-white">Histoire islamique</h1>
+    <p class="text-[#8b949e] mt-3">Frise chronologique sombre et doree avec prophetes, Sira, califes et grandes batailles.</p>
+  </div>
+
+  <div class="mt-10 relative before:absolute before:left-4 before:top-0 before:bottom-0 before:w-px before:bg-[#c9a84c]/35">
+    <div class="space-y-6">
+      {% for item in timeline %}
+      <article class="ml-12 rounded-3xl border border-[#c9a84c]/20 bg-[#161b22] p-6 relative">
+        <span class="absolute -left-[2.9rem] top-8 h-8 w-8 rounded-full bg-[#c9a84c] text-[#080c10] flex items-center justify-center font-bold">{{ item.index }}</span>
+        <p class="text-[#c9a84c] text-xs uppercase tracking-[0.3em]">{{ item.section }}</p>
+        <h2 class="text-white text-2xl font-semibold mt-2">{{ item.title }}</h2>
+        <p class="text-[#dfe7ef] mt-3">{{ item.description }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="mt-10 rounded-3xl border border-[#c9a84c]/20 bg-[#0d1117] p-6 max-w-3xl">
+    <p class="text-[#f0c060] uppercase tracking-[0.3em] text-xs">Quiz histoire</p>
+    <p class="text-white text-xl mt-4">{{ quiz.question }}</p>
+    <p class="text-[#8b949e] mt-3">Reponse attendue: {{ quiz.answer }}</p>
+  </div>
+</section>
+{% endblock %}

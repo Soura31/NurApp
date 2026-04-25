@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Badges | NurCoran{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="font-cinzel text-4xl text-white">Badges</h1>
+      <p class="text-[#8b949e] mt-2">Vos recompenses debloquees et le catalogue complet.</p>
+    </div>
+    <div class="rounded-2xl border border-[#c9a84c]/20 bg-[#161b22] px-5 py-4">
+      <p class="text-[#8b949e]">Debloques</p>
+      <p class="text-3xl font-black text-[#f0c060]">{{ summary.badge_count }}</p>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5 mt-8">
+    {% for badge in badge_catalog %}
+    <article class="rounded-3xl border {% if badge.id in unlocked_badge_ids %}border-[#c9a84c]/45 bg-[#c9a84c]/8{% else %}border-white/10 bg-[#161b22]{% endif %} p-6">
+      <div class="h-14 w-14 rounded-full border border-[#c9a84c]/35 bg-[#0d1117] flex items-center justify-center text-[#f0c060] text-xl">
+        <i class="{{ badge.icon }}"></i>
+      </div>
+      <h2 class="text-white font-semibold text-xl mt-4">{{ badge.name }}</h2>
+      <p class="text-[#8b949e] mt-2">{{ badge.description }}</p>
+      <p class="text-[#c9a84c] text-sm mt-4">{% if badge.id in unlocked_badge_ids %}Debloque{% else %}A debloquer{% endif %}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

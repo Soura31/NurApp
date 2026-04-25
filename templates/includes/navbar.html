@@ -1,70 +1,79 @@
-<nav class="fixed top-0 w-full z-50 transition-all duration-500" id="main-nav" x-data="{scrolled:false}" @scroll.window="scrolled = window.scrollY > 40" :class="scrolled ? 'bg-[#0d1117]/95 backdrop-blur-xl border-b border-[#c9a84c]/20' : 'bg-transparent'">
+<nav class="fixed top-0 w-full z-50 transition-all duration-500 bg-[#080c10]/90 backdrop-blur-xl border-b border-[#c9a84c]/15" id="main-nav">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-    <a href="/" class="flex items-center gap-3">
+    <a href="/" class="flex items-center gap-3" aria-label="Retour a l'accueil NurCoran">
       <svg class="w-8 h-8 text-[#c9a84c] moon-spin" viewBox="0 0 24 24" fill="currentColor"><path d="M21 14.2A9 9 0 1 1 9.8 3a7 7 0 1 0 11.2 11.2Z"/></svg>
-      <span class="font-cinzel text-xl sm:text-2xl font-bold nur-gold-text">NurCoran</span>
+      <div>
+        <span class="font-cinzel text-xl sm:text-2xl font-bold nur-gold-text">NurCoran</span>
+        <p class="text-[10px] uppercase tracking-[0.4em] text-[#8b949e]">SaaS spirituel</p>
+      </div>
     </a>
 
-    <div class="hidden lg:flex items-center gap-6 text-sm">
-      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/quran/"><i class="fa-solid fa-book-quran"></i>Coran</a>
-      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/prayer-times/"><i class="fa-solid fa-clock"></i>Prieres</a>
-      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/prayer-times/qibla/"><i class="fa-solid fa-location-crosshairs"></i>Qibla</a>
-      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/calendar/"><i class="fa-solid fa-calendar-days"></i>Calendrier</a>
-      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/hifz/"><i class="fa-solid fa-brain"></i>Hifz</a>
-      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/assistant/"><i class="fa-solid fa-comments"></i>Assistant</a>
-      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/azkar/"><i class="fa-solid fa-hands-praying"></i>Azkar</a>
-      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/tasbih/"><i class="fa-solid fa-ring"></i>Tasbih</a>
-      <a class="text-gray-300 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/community/"><i class="fa-solid fa-users"></i>Communaute</a>
+    <div class="hidden xl:flex items-center gap-5 text-sm">
+      <a class="text-gray-300 hover:text-[#c9a84c]" href="/quran/">Coran</a>
+      <a class="text-gray-300 hover:text-[#c9a84c]" href="/prayer-times/">Prieres</a>
+      <a class="text-gray-300 hover:text-[#c9a84c]" href="/duas/">Duas</a>
+      <a class="text-gray-300 hover:text-[#c9a84c]" href="/asmaul-husna/">Asma ul Husna</a>
+      <a class="text-gray-300 hover:text-[#c9a84c]" href="/ramadan/">Ramadan</a>
+      <a class="text-gray-300 hover:text-[#c9a84c]" href="/community/">Ummah Feed</a>
+      <a class="text-gray-300 hover:text-[#c9a84c]" href="/groupes/">Groupes</a>
+      <a class="text-gray-300 hover:text-[#c9a84c]" href="/defis/">Defis</a>
+      <a class="text-gray-300 hover:text-[#c9a84c]" href="/histoire/">Histoire</a>
     </div>
 
     <div class="hidden sm:flex items-center gap-2">
       {% if navbar_hijri_today %}
-        <span class="hidden xl:inline-flex items-center gap-2 px-3 py-2 rounded-full border border-[#c9a84c]/30 bg-[#c9a84c]/10 text-[#f0c060] text-xs">
-          <i class="fa-solid fa-moon"></i>{{ navbar_hijri_today.label }}
-        </span>
+      <span class="hidden lg:inline-flex items-center gap-2 px-3 py-2 rounded-full border border-[#c9a84c]/30 bg-[#c9a84c]/10 text-[#f0c060] text-xs">
+        <i class="fa-solid fa-moon"></i>{{ navbar_hijri_today.label }}
+      </span>
       {% endif %}
-      <button type="button" id="theme-toggle" onclick="toggleTheme()" class="px-3 py-2 rounded-full border border-[#c9a84c]/50 text-[#c9a84c] hover:bg-[#c9a84c]/10" aria-label="Activer le mode jour">
-        <i id="theme-toggle-icon" class="fa-solid fa-sun"></i>
-      </button>
+      <a href="/parametres/notifications/" class="h-10 w-10 rounded-full border border-[#c9a84c]/30 text-[#c9a84c] flex items-center justify-center" aria-label="Parametres de notifications">
+        <i class="fa-solid fa-bell"></i>
+      </a>
       {% if user.is_authenticated %}
-        <a href="/accounts/logout/" class="px-4 py-2 rounded-full border border-red-400/40 text-red-300 hover:bg-red-500/10">Deconnexion</a>
-        <a href="/dashboard/" class="h-10 w-10 rounded-full bg-[#c9a84c] text-[#080c10] flex items-center justify-center font-bold">{{ user.username|default:user.email|first|upper }}</a>
+        <a href="/dashboard/" class="px-4 py-2 rounded-full border border-[#c9a84c]/40 text-[#f0c060] hover:bg-[#c9a84c]/10">{{ global_profile_summary.streak|default:0 }} jours</a>
+        <a href="{{ user.userprofile.get_public_url }}" class="h-10 min-w-10 px-3 rounded-full bg-[#c9a84c] text-[#080c10] flex items-center justify-center font-bold">{{ user.username|first|upper }}</a>
       {% else %}
         <a href="/accounts/login/" class="px-4 py-2 rounded-full border border-[#c9a84c]/50 text-[#c9a84c] hover:bg-[#c9a84c]/10">Connexion</a>
-        <a href="/accounts/signup/" class="px-4 py-2 rounded-full font-bold text-[#080c10]" style="background: var(--nur-gold-gradient);">S'inscrire</a>
+        <a href="/accounts/signup/" class="px-4 py-2 rounded-full font-bold text-[#080c10]" style="background: var(--nur-gold-gradient);">Inscription</a>
       {% endif %}
     </div>
 
-    <button id="hamburger" type="button" class="lg:hidden h-10 w-10 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c] flex items-center justify-center" onclick="toggleMobileMenu()" aria-label="Ouvrir le menu">
+    <button id="hamburger" type="button" class="xl:hidden h-10 w-10 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c] flex items-center justify-center" onclick="toggleMobileMenu()" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false">
       <i class="fa-solid fa-bars"></i>
     </button>
   </div>
 
-  <div id="mobile-menu" class="mobile-menu lg:hidden px-6">
-    {% if navbar_hijri_today %}
-      <div class="text-xs text-[#f0c060] px-5 py-2 rounded-full border border-[#c9a84c]/30 bg-[#c9a84c]/10 inline-flex items-center gap-2">
-        <i class="fa-solid fa-moon"></i>{{ navbar_hijri_today.label }}
+  <div id="mobile-menu-backdrop" class="mobile-menu-backdrop xl:hidden" onclick="toggleMobileMenu(true)"></div>
+  <div id="mobile-menu" class="mobile-menu xl:hidden px-5 py-5" aria-hidden="true">
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <p class="text-[#f0c060] uppercase tracking-[0.35em] text-[10px]">Navigation</p>
+        <p class="text-white text-lg font-semibold mt-2">Explorer NurCoran</p>
       </div>
-    {% endif %}
-    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/quran/" onclick="toggleMobileMenu()"><i class="fa-solid fa-book-quran"></i>Coran</a>
-    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/prayer-times/" onclick="toggleMobileMenu()"><i class="fa-solid fa-clock"></i>Prieres</a>
-    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/prayer-times/qibla/" onclick="toggleMobileMenu()"><i class="fa-solid fa-location-crosshairs"></i>Qibla</a>
-    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/calendar/" onclick="toggleMobileMenu()"><i class="fa-solid fa-calendar-days"></i>Calendrier</a>
-    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/hifz/" onclick="toggleMobileMenu()"><i class="fa-solid fa-brain"></i>Hifz</a>
-    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/assistant/" onclick="toggleMobileMenu()"><i class="fa-solid fa-comments"></i>Assistant</a>
-    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/azkar/" onclick="toggleMobileMenu()"><i class="fa-solid fa-hands-praying"></i>Azkar</a>
-    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/tasbih/" onclick="toggleMobileMenu()"><i class="fa-solid fa-ring"></i>Tasbih</a>
-    <a class="text-gray-200 hover:text-[#c9a84c] inline-flex items-center gap-2" href="/community/" onclick="toggleMobileMenu()"><i class="fa-solid fa-users"></i>Communaute</a>
-    <button type="button" id="theme-toggle-mobile" class="px-5 py-2 rounded-full border border-[#c9a84c]/50 text-[#c9a84c] text-left" onclick="toggleTheme()">
-      <i id="theme-toggle-mobile-icon" class="fa-solid fa-sun"></i>
-      <span id="theme-toggle-mobile-text">Mode jour</span>
-    </button>
-    {% if user.is_authenticated %}
-      <a href="/dashboard/" class="mt-2 px-5 py-2 rounded-full bg-[#c9a84c] text-[#080c10] font-bold" onclick="toggleMobileMenu()">Mon compte</a>
-      <a href="/accounts/logout/" class="px-5 py-2 rounded-full border border-red-400/40 text-red-300" onclick="toggleMobileMenu()">Deconnexion</a>
-    {% else %}
-      <a href="/accounts/login/" class="mt-2 px-5 py-2 rounded-full border border-[#c9a84c]/50 text-[#c9a84c]" onclick="toggleMobileMenu()">Connexion</a>
-      <a href="/accounts/signup/" class="px-5 py-2 rounded-full font-bold text-[#080c10]" style="background: var(--nur-gold-gradient);" onclick="toggleMobileMenu()">S'inscrire</a>
-    {% endif %}
+      <button type="button" class="h-10 w-10 rounded-full border border-[#c9a84c]/20 text-[#c9a84c]" onclick="toggleMobileMenu(true)" aria-label="Fermer le menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mt-5">
+      <a class="mobile-menu-link" href="/quran/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-book-quran"></i><span>Coran</span></a>
+      <a class="mobile-menu-link" href="/prayer-times/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-clock"></i><span>Prieres</span></a>
+      <a class="mobile-menu-link" href="/duas/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-hands-praying"></i><span>Duas</span></a>
+      <a class="mobile-menu-link" href="/asmaul-husna/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-star-and-crescent"></i><span>Asma</span></a>
+      <a class="mobile-menu-link" href="/ramadan/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-moon"></i><span>Ramadan</span></a>
+      <a class="mobile-menu-link" href="/community/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-users"></i><span>Feed</span></a>
+      <a class="mobile-menu-link" href="/groupes/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-people-group"></i><span>Groupes</span></a>
+      <a class="mobile-menu-link" href="/defis/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-trophy"></i><span>Defis</span></a>
+      <a class="mobile-menu-link" href="/histoire/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-timeline"></i><span>Histoire</span></a>
+      <a class="mobile-menu-link" href="/calendar/" onclick="toggleMobileMenu(true)"><i class="fa-solid fa-calendar-days"></i><span>Calendrier</span></a>
+    </div>
+    <div class="mt-5 flex flex-col gap-3">
+      {% if user.is_authenticated %}
+        <a href="/dashboard/" class="px-5 py-3 rounded-xl bg-[#c9a84c] text-[#080c10] font-bold text-center" onclick="toggleMobileMenu(true)">Mon dashboard</a>
+        <a href="/parametres/notifications/" class="px-5 py-3 rounded-xl border border-[#c9a84c]/35 text-[#c9a84c] text-center" onclick="toggleMobileMenu(true)">Notifications</a>
+      {% else %}
+        <a href="/accounts/login/" class="px-5 py-3 rounded-xl border border-[#c9a84c]/50 text-[#c9a84c] text-center" onclick="toggleMobileMenu(true)">Connexion</a>
+        <a href="/accounts/signup/" class="px-5 py-3 rounded-xl font-bold text-[#080c10] text-center" style="background: var(--nur-gold-gradient);" onclick="toggleMobileMenu(true)">Inscription</a>
+      {% endif %}
+    </div>
   </div>
 </nav>

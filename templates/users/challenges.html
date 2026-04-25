@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Defis collectifs | NurCoran{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="font-cinzel text-4xl text-white">Defis collectifs</h1>
+      <p class="text-[#8b949e] mt-2">Compteur global de versets lus, Khatam collectif mensuel et top 10.</p>
+    </div>
+    <div class="rounded-3xl border border-[#c9a84c]/20 bg-[#161b22] px-5 py-4">
+      <p class="text-[#8b949e]">Versets lus globalement</p>
+      <p class="text-3xl font-black text-[#f0c060]">{{ global_counter }}</p>
+    </div>
+  </div>
+
+  <div class="grid xl:grid-cols-2 gap-6 mt-8">
+    {% for item in challenges %}
+    <article class="rounded-3xl border border-[#c9a84c]/20 bg-[#0d1117] p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[#c9a84c] uppercase tracking-[0.3em] text-xs">{{ item.challenge.season }}</p>
+          <h2 class="text-white text-2xl font-semibold mt-2">{{ item.challenge.title }}</h2>
+          <p class="text-[#8b949e] mt-2">{{ item.challenge.description }}</p>
+        </div>
+        <span class="px-3 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]">{{ item.challenge.progress_percent }}%</span>
+      </div>
+      <div class="mt-4 h-3 rounded-full bg-white/5 overflow-hidden">
+        <div class="h-full rounded-full" style="width:{{ item.challenge.progress_percent }}%; background:var(--nur-gold-gradient)"></div>
+      </div>
+      <p class="text-[#8b949e] text-sm mt-2">{{ item.challenge.current_value }} / {{ item.challenge.target_value }} versets</p>
+      <div class="mt-5">
+        <p class="text-[#f0c060] font-semibold">Top 10</p>
+        <div class="space-y-2 mt-3">
+          {% for leader in item.leaders %}
+          <div class="rounded-2xl border border-white/10 bg-[#161b22] p-3 flex items-center justify-between gap-3">
+            <a href="/profil/{{ leader.user.username }}/" class="text-white">{{ leader.user.username }}</a>
+            <span class="text-[#c9a84c]">{{ leader.contribution }}</span>
+          </div>
+          {% empty %}
+          <p class="text-[#8b949e]">Aucune contribution pour le moment.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

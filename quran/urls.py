@@ -16,6 +16,7 @@ from .views import (
     TafsirApiView,
     ToggleReadSurahView,
     UpdateKhatamGoalView,
+    WordByWordApiView,
 )
 
 app_name = "quran"
@@ -25,6 +26,7 @@ urlpatterns = [
     path("", QuranListView.as_view(), name="surah_list"),
     path("search/", QuranSearchApiView.as_view(), name="search"),
     path("tafsir/", TafsirApiView.as_view(), name="tafsir"),
+    path("words/", WordByWordApiView.as_view(), name="words"),
     path("read/toggle/", ToggleReadSurahView.as_view(), name="read_toggle"),
     path("progress/reset/", ResetKhatamTrackerView.as_view(), name="progress_reset"),
     path("progress/goal/", UpdateKhatamGoalView.as_view(), name="progress_goal"),

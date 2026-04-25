@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Duas | NurCoran{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="font-cinzel text-4xl text-white">Duas</h1>
+      <p class="text-[#8b949e] mt-2">Base de duas categorisees, partageables et enregistrables en favoris.</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      {% for category in categories %}
+      <a href="/duas/?categorie={{ category.slug }}" class="px-4 py-2 rounded-full border border-[#c9a84c]/30 text-[#c9a84c] {% if selected_category == category.slug %}bg-[#c9a84c]/10{% endif %}">{{ category.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if daily_dua %}
+  <div class="mt-8 rounded-3xl border border-[#c9a84c]/20 bg-[#0d1117] p-6">
+    <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Dua du jour</p>
+    <h2 class="text-white text-2xl font-semibold mt-3">{{ daily_dua.title }}</h2>
+    <p class="font-amiri text-3xl text-white text-right mt-4" dir="rtl" lang="ar">{{ daily_dua.arabic_text }}</p>
+    <p class="text-[#c9a84c] italic mt-4">{{ daily_dua.transliteration }}</p>
+    <p class="text-[#dfe7ef] mt-4">{{ daily_dua.translation }}</p>
+  </div>
+  {% endif %}
+
+  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5 mt-8">
+    {% for dua in duas %}
+    <article class="rounded-3xl border border-[#c9a84c]/20 bg-[#161b22] p-6">
+      <p class="text-[#c9a84c] text-sm">{{ dua.category.name }}</p>
+      <h2 class="text-white font-semibold text-xl mt-2">{{ dua.title }}</h2>
+      <p class="font-amiri text-3xl text-white text-right mt-4" dir="rtl" lang="ar">{{ dua.arabic_text }}</p>
+      <p class="text-[#c9a84c] italic mt-4">{{ dua.transliteration }}</p>
+      <p class="text-[#dfe7ef] text-sm mt-4">{{ dua.translation }}</p>
+      <div class="mt-5 flex flex-wrap gap-2 text-sm">
+        <span class="px-3 py-2 rounded-full border border-[#c9a84c]/20 text-[#f0c060]">Audio</span>
+        <a href="https://wa.me/?text={{ dua.share_text|urlencode }}" target="_blank" rel="noreferrer" class="px-3 py-2 rounded-full border border-[#c9a84c]/20 text-[#f0c060]">Partager</a>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'users:toggle_favorite_dua' dua.id %}">
+          {% csrf_token %}
+          <button class="px-3 py-2 rounded-full border border-[#c9a84c]/20 text-[#f0c060]">{% if dua.id in favorite_dua_ids %}Retirer favori{% else %}Favori{% endif %}</button>
+        </form>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

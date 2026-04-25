@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Profil public | NurCoran{% endblock %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+  <div class="rounded-[2rem] border border-[#c9a84c]/20 bg-[#0d1117] p-8">
+    <div class="flex flex-wrap items-start justify-between gap-6">
+      <div>
+        <div class="h-20 w-20 rounded-full bg-[#c9a84c] text-[#080c10] flex items-center justify-center text-3xl font-bold">{{ profile_user.username|first|upper }}</div>
+        <h1 class="font-cinzel text-4xl text-white mt-5">{{ profile_user.username }}</h1>
+        <p class="text-[#8b949e] mt-2">{{ profile_user.userprofile.bio|default:"Profil spirituel NurCoran" }}</p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        {% if user.is_authenticated and user != profile_user %}
+        <form method="post" action="/profil/{{ profile_user.username }}/suivre/">{% csrf_token %}
+          <button class="px-5 py-3 rounded-2xl {% if is_following %}border border-[#c9a84c]/35 text-[#c9a84c]{% else %}text-[#080c10]{% endif %}" {% if not is_following %}style="background:var(--nur-gold-gradient)"{% endif %}>
+            {% if is_following %}Ne plus suivre{% else %}Suivre{% endif %}
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 xl:grid-cols-5 gap-4 mt-8">
+      <div class="rounded-2xl border border-[#c9a84c]/15 bg-[#161b22] p-4"><p class="text-[#8b949e]">Streak</p><p class="text-2xl text-[#f0c060] font-black">{{ summary.streak }} jours</p></div>
+      <div class="rounded-2xl border border-[#c9a84c]/15 bg-[#161b22] p-4"><p class="text-[#8b949e]">Badges</p><p class="text-2xl text-[#f0c060] font-black">{{ summary.badge_count }}</p></div>
+      <div class="rounded-2xl border border-[#c9a84c]/15 bg-[#161b22] p-4"><p class="text-[#8b949e]">Khatam</p><p class="text-2xl text-[#f0c060] font-black">{{ summary.quran_progress.surah_percent }}%</p></div>
+      <div class="rounded-2xl border border-[#c9a84c]/15 bg-[#161b22] p-4"><p class="text-[#8b949e]">Memorisees</p><p class="text-2xl text-[#f0c060] font-black">{{ summary.memorized_count }}</p></div>
+      <div class="rounded-2xl border border-[#c9a84c]/15 bg-[#161b22] p-4"><p class="text-[#8b949e]">Publications</p><p class="text-2xl text-[#f0c060] font-black">{{ summary.posts_count }}</p></div>
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-[1fr,.9fr] gap-6 mt-8">
+    <div class="rounded-3xl border border-[#c9a84c]/20 bg-[#161b22] p-6">
+      <h2 class="font-cinzel text-2xl text-white">Badges et progression</h2>
+      <div class="grid sm:grid-cols-2 gap-4 mt-5">
+        {% for user_badge in summary.badges %}
+        <div class="rounded-2xl border border-[#c9a84c]/15 bg-[#0d1117] p-4">
+          <p class="text-[#c9a84c]">{{ user_badge.badge.name }}</p>
+          <p class="text-[#8b949e] text-sm mt-2">{{ user_badge.badge.description }}</p>
+        </div>
+        {% empty %}
+        <p class="text-[#8b949e]">Aucun badge visible.</p>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="rounded-3xl border border-[#c9a84c]/20 bg-[#161b22] p-6">
+      <h2 class="font-cinzel text-2xl text-white">Publications recentes</h2>
+      <div class="space-y-4 mt-5">
+        {% for post in recent_posts %}
+        <a href="/community/post/{{ post.id }}/" class="block rounded-2xl border border-white/10 bg-[#0d1117] p-4">
+          <p class="text-white font-semibold">{{ post.title }}</p>
+          <p class="text-[#8b949e] text-sm mt-2">{{ post.content|truncatewords:18 }}</p>
+        </a>
+        {% empty %}
+        <p class="text-[#8b949e]">Aucune publication publique.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -20,6 +20,7 @@ urlpatterns = [
     path("azkar/", include("azkar.urls")),
     path("tasbih/", include("tasbih.urls")),
     path("asma-allah/", include("asma.urls")),
+    path("asmaul-husna/", include(("asma.urls", "asma_alias"), namespace="asma_alias")),
     path("hadith/", include("hadith.urls")),
     path("community/", include("community.urls")),
     path("dashboard/", include("dashboard.urls")),

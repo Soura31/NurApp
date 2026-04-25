@@ -1,36 +1,88 @@
-﻿{% extends 'base.html' %}
-{% block title %}Horaires de Prieres{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Horaires de prieres | NurCoran{% endblock %}
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10" data-aos="fade-up">
-  <h1 class="font-cinzel text-4xl text-white">Horaires de Prieres</h1>
-  <p class="text-[#8b949e] mt-2">{{ city }}, {{ country }}</p>
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="font-cinzel text-4xl text-white">Horaires de prieres</h1>
+      <p class="text-[#8b949e] mt-2">{{ city }}, {{ country }} {% if auto_location_enabled %}- geolocalisation automatique conservee{% endif %}</p>
+    </div>
+    <a href="/parametres/notifications/" class="px-5 py-3 rounded-2xl border border-[#c9a84c]/35 text-[#c9a84c]">Parametres rappels</a>
+  </div>
 
-  <div class="rounded-3xl p-8 text-center mt-6" style="background:linear-gradient(135deg,#1a6b4a,#2d9b6f);box-shadow:0 0 60px rgba(26,107,74,.3)">
-    <p class="text-white/70">Prochaine priere</p>
-    <p id="next-prayer-name" class="font-cinzel text-5xl text-white font-black">Fajr</p>
-    <p id="next-prayer-time" class="text-[#f0c060] text-4xl">--:--</p>
-    <p id="countdown" class="text-white text-2xl font-mono">00:00:00</p>
+  <div class="rounded-[2rem] p-8 text-center mt-6 border border-[#c9a84c]/20" style="background:#c9a84c; box-shadow:0 0 60px rgba(201,168,76,.28)">
+    <p class="text-[#080c10]/70 uppercase tracking-[0.35em] text-xs">Prochaine priere</p>
+    <p id="next-prayer-name" class="font-cinzel text-5xl text-[#080c10] font-black mt-3">Fajr</p>
+    <p id="next-prayer-time" class="text-[#080c10] text-4xl">--:--</p>
+    <p id="countdown" class="text-[#0f1419] text-2xl font-mono">00:00:00</p>
   </div>
 
   <div class="grid md:grid-cols-5 gap-4 mt-6" id="prayer-cards">
     {% for name, time in timings.items %}
-    <div class="rounded-xl p-4 border border-[#c9a84c]/20 bg-[#161b22] text-center prayer-card" data-name="{{ name }}" data-time="{{ time }}">
-      <p class="text-[#e6edf3] font-semibold">{{ name }}</p>
-      <p class="text-[#f0c060] text-2xl">{{ time }}</p>
+    <div class="rounded-2xl p-5 border-2 border-[#c9a84c]/25 bg-[#0f1419] text-center prayer-card" data-name="{{ name }}" data-time="{{ time }}">
+      <p class="text-white font-semibold">{{ name }}</p>
+      <p class="text-[#f0c060] text-2xl mt-2">{{ time }}</p>
     </div>
     {% endfor %}
   </div>
 
-  <div class="mt-8 bg-[#161b22] border border-[#c9a84c]/20 rounded-2xl p-5 overflow-x-auto">
+  <div class="mt-8 bg-[#161b22] border border-[#c9a84c]/20 rounded-3xl p-5 overflow-x-auto">
     <h2 class="font-cinzel text-2xl text-white mb-3">Calendrier mensuel</h2>
     <table class="w-full text-sm min-w-[720px]">
-      <thead class="text-[#c9a84c]"><tr><th class="text-left py-2">Date</th><th>Fajr</th><th>Dhuhr</th><th>Asr</th><th>Maghrib</th><th>Isha</th></tr></thead>
-      <tbody class="text-[#8b949e]">
+      <thead class="text-[#c9a84c]">
+        <tr>
+          <th class="text-left py-2">Date</th>
+          <th>Fajr</th><th>Dhuhr</th><th>Asr</th><th>Maghrib</th><th>Isha</th>
+        </tr>
+      </thead>
+      <tbody class="text-[#dce5ee]">
         {% for d in monthly_calendar|slice:':12' %}
-        <tr class="border-t border-white/5"><td class="py-2">{{ d.date.gregorian.date }}</td><td class="text-center">{{ d.timings.Fajr|slice:':5' }}</td><td class="text-center">{{ d.timings.Dhuhr|slice:':5' }}</td><td class="text-center">{{ d.timings.Asr|slice:':5' }}</td><td class="text-center">{{ d.timings.Maghrib|slice:':5' }}</td><td class="text-center">{{ d.timings.Isha|slice:':5' }}</td></tr>
+        <tr class="border-t border-white/5">
+          <td class="py-2">{{ d.date.gregorian.date }}</td>
+          <td class="text-center">{{ d.timings.Fajr|slice:':5' }}</td>
+          <td class="text-center">{{ d.timings.Dhuhr|slice:':5' }}</td>
+          <td class="text-center">{{ d.timings.Asr|slice:':5' }}</td>
+          <td class="text-center">{{ d.timings.Maghrib|slice:':5' }}</td>
+          <td class="text-center">{{ d.timings.Isha|slice:':5' }}</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const cards = Array.from(document.querySelectorAll('.prayer-card'));
+    if (!cards.length) return;
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const schedule = cards.map((card) => {
+      const [hours, minutes] = (card.dataset.time || '00:00').split(':');
+      const time = new Date(today + 'T' + String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':00');
+      return { card, name: card.dataset.name, time };
+    });
+    let next = schedule.find((item) => item.time > now) || schedule[0];
+    document.getElementById('next-prayer-name').textContent = next.name;
+    document.getElementById('next-prayer-time').textContent = next.card.dataset.time || '--:--';
+    next.card.classList.add('border-[#c9a84c]', 'shadow-[0_0_25px_rgba(201,168,76,.15)]');
+
+    function updateCountdown() {
+      const current = new Date();
+      let target = next.time;
+      if (target < current) {
+        target = new Date(target.getTime() + 24 * 60 * 60 * 1000);
+      }
+      const diff = target - current;
+      const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
+      const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+      const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+      document.getElementById('countdown').textContent = hours + ':' + minutes + ':' + seconds;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  })();
+</script>
 {% endblock %}

@@ -12,13 +12,41 @@
   }
 
   .mushaf-text {
-    font-family: 'Amiri Quran', 'Amiri', serif;
-    font-size: 1.65rem;
+    font-family: var(--reader-arabic-font, 'Amiri Quran'), 'Amiri', serif;
+    font-size: var(--reader-arabic-size, 1.65rem);
     line-height: 3.4rem;
     text-align: justify;
     direction: rtl;
     color: var(--surah-mode-main, #c9a84c);
     padding: 0 1.25rem;
+  }
+
+  .verse-meta-block {
+    direction: ltr;
+    text-align: left;
+    margin: 0.6rem 0 1.4rem;
+  }
+
+  .verse-transliteration {
+    color: rgba(201, 168, 76, 0.78);
+    font-style: italic;
+    font-size: 0.98rem;
+    display: none;
+  }
+
+  .verse-translation {
+    color: var(--reader-translation-color, #dce5ef);
+    font-size: var(--reader-translation-size, 1rem);
+    line-height: 1.8;
+    margin-top: 0.45rem;
+  }
+
+  .show-transliteration .verse-transliteration {
+    display: block;
+  }
+
+  .hide-translation .verse-translation {
+    display: none;
   }
 
   .ayah-number {
@@ -56,6 +84,19 @@
   }
 
   .ayah-fragment { display: inline; }
+
+  .ayah-fragment.word-by-word-active .word-token {
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .ayah-fragment.word-by-word-active .word-token:hover {
+    background: rgba(201, 168, 76, 0.16);
+    border-color: rgba(201, 168, 76, 0.55);
+    border-radius: 0.45rem;
+    color: #f7d98d;
+  }
 
   .ayah-action-group {
     display: inline-flex;
@@ -150,6 +191,76 @@
     backdrop-filter: blur(16px);
   }
 
+  .player-shell {
+    background: rgba(13, 17, 23, 0.94);
+    backdrop-filter: blur(22px);
+    border-top: 1px solid rgba(201, 168, 76, 0.18);
+  }
+
+  .immersive-active nav,
+  .immersive-active footer,
+  .immersive-active .mobile-bottom-nav,
+  .immersive-active #assistant-fab,
+  .immersive-active #assistant-widget {
+    display: none !important;
+  }
+
+  .immersive-active main {
+    padding-top: 0 !important;
+    padding-bottom: 7rem !important;
+  }
+
+  .reader-theme-surface-night { background: #080c10; }
+  .reader-theme-surface-day { background: #f8fafc; }
+  .reader-theme-surface-parchment { background: #f4ead5; }
+  .reader-theme-surface-green { background: #0c1c15; }
+
+  html[data-theme="night"] .mushaf-page-wrapper,
+  body.theme-dark .mushaf-page-wrapper {
+    --surah-mode-text: #c9a84c;
+    --surah-mode-main: #c9a84c;
+    --surah-page-bg: #080c10;
+    --surah-header-bg: rgba(8,12,16,0.95);
+    --surah-sub-label: #6b7280;
+    --reader-translation-color: #dce5ef;
+  }
+
+  html[data-theme="day"] .mushaf-page-wrapper,
+  body.theme-day .mushaf-page-wrapper,
+  body.theme-light .mushaf-page-wrapper {
+    --surah-mode-text: #0f172a;
+    --surah-mode-main: #0f172a;
+    --surah-page-bg: #f8fafc;
+    --surah-header-bg: rgba(248,250,252,0.95);
+    --surah-sub-label: #64748b;
+    --reader-translation-color: #334155;
+  }
+
+  html[data-theme="parchment"] .mushaf-page-wrapper,
+  body.theme-parchment .mushaf-page-wrapper {
+    --surah-mode-text: #5c4217;
+    --surah-mode-main: #5c4217;
+    --surah-page-bg: #f4ead5;
+    --surah-header-bg: rgba(244,234,213,0.96);
+    --surah-sub-label: #7a6340;
+    --reader-translation-color: #5b4630;
+  }
+
+  .reader-theme-green {
+    --surah-mode-text: #d7b45d;
+    --surah-mode-main: #d7b45d;
+    --surah-page-bg: #0c1c15;
+    --surah-header-bg: rgba(12,28,21,0.94);
+    --surah-sub-label: #7aa38f;
+    --reader-translation-color: #c9dfd4;
+  }
+
+  .tafsir-tab.is-active {
+    background: rgba(201, 168, 76, 0.14);
+    color: #f0c060;
+    border-color: rgba(201, 168, 76, 0.45);
+  }
+
   html[data-theme="dark"] .mushaf-page-wrapper,
   body.theme-dark .mushaf-page-wrapper {
     --surah-mode-text: #c9a84c;
@@ -193,6 +304,10 @@
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-3">
           <button type="button" id="tajweed-toggle" class="px-4 py-2 rounded-full border border-[#c9a84c]/35 text-[#c9a84c] hover:bg-[#c9a84c]/10">Mode Tajweed OFF</button>
+          <button type="button" id="transliteration-toggle" class="px-4 py-2 rounded-full border border-[#c9a84c]/25 text-[#8b949e] hover:border-[#c9a84c]/45 hover:text-[#c9a84c]">Translitteration OFF</button>
+          <button type="button" id="word-by-word-toggle" class="px-4 py-2 rounded-full border border-[#c9a84c]/25 text-[#8b949e] hover:border-[#c9a84c]/45 hover:text-[#c9a84c]">Mot a mot OFF</button>
+          <button type="button" id="translation-toggle" class="px-4 py-2 rounded-full border border-[#c9a84c]/25 text-[#8b949e] hover:border-[#c9a84c]/45 hover:text-[#c9a84c]">Traduction ON</button>
+          <button type="button" id="immersive-toggle" class="px-4 py-2 rounded-full border border-[#1a6b4a]/35 text-[#9de3c4] hover:bg-[#1a6b4a]/10">Mode immersif</button>
           <span class="px-4 py-2 rounded-full border {% if is_read_surah %}border-[#1a6b4a]/35 text-[#9de3c4] bg-[#1a6b4a]/10{% else %}border-[#c9a84c]/25 text-[#8b949e]{% endif %}" id="read-status-badge">
             {% if is_read_surah %}Sourate lue ✓{% else %}Pas encore marquee comme lue{% endif %}
           </span>
@@ -210,6 +325,27 @@
         </form>
         {% endif %}
       </div>
+      <div class="grid xl:grid-cols-[1.1fr,1fr] gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" id="arabic-size-down" class="px-3 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]">A- arabe</button>
+          <button type="button" id="arabic-size-up" class="px-3 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]">A+ arabe</button>
+          <button type="button" id="translation-size-down" class="px-3 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]">A- traduction</button>
+          <button type="button" id="translation-size-up" class="px-3 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]">A+ traduction</button>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <select id="arabic-font-selector" class="rounded-full border border-[#c9a84c]/25 bg-transparent px-4 py-2 text-[var(--surah-mode-text,#c9a84c)]">
+            <option value="'Amiri Quran'">Amiri</option>
+            <option value="'Scheherazade New'">Scheherazade New</option>
+            <option value="'Noto Naskh Arabic'">Noto Naskh</option>
+          </select>
+          <select id="reader-surface-selector" class="rounded-full border border-[#1a6b4a]/25 bg-transparent px-4 py-2 text-[var(--surah-mode-text,#c9a84c)]">
+            <option value="night">Fond sombre</option>
+            <option value="parchment">Parchemin</option>
+            <option value="day">Blanc</option>
+            <option value="green">Vert</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -219,8 +355,8 @@
 
   <div class="mushaf-text mx-2" id="mushaf-content">
     {% for verse in verses %}
-      <span class="ayah-fragment">
-        <span class="ayah-text" id="ayah-{{ verse.verse_number }}" data-plain-text="{{ verse.text_uthmani|escape }}" data-tajweed-html="{{ verse.tajweed_html|escape }}">
+      <div class="ayah-fragment" data-verse-reference="{{ surah_number }}:{{ verse.verse_number }}">
+        <span class="ayah-text" id="ayah-{{ verse.verse_number }}" data-plain-text="{{ verse.text_uthmani|escape }}" data-tajweed-html="{{ verse.tajweed_html|escape }}" data-transliteration="{{ verse.transliteration|escape }}">
           {{ verse.text_uthmani }}
         </span>
         <span class="ayah-action-group">
@@ -247,7 +383,11 @@
           </button>
           {% endif %}
         </span>
-      </span>
+        <div class="verse-meta-block">
+          <p class="verse-transliteration">{{ verse.transliteration }}</p>
+          <p class="verse-translation">{{ verse.translation_fr }}</p>
+        </div>
+      </div>
     {% endfor %}
   </div>
 
@@ -275,7 +415,7 @@
     <span class="page-number-circle">{{ page_number_ar }}</span>
   </div>
 
-  <div class="fixed bottom-20 left-0 right-0 px-4 flex justify-between items-center">
+  <div class="fixed bottom-36 left-0 right-0 px-4 flex justify-between items-center z-30">
     {% if next_surah %}
     <a href="{% url 'quran:surah_detail' next_surah %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition" style="color: var(--surah-mode-text, #c9a84c); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3)">
       <i class="fa-solid fa-chevron-right"></i> السورة التالية
@@ -287,6 +427,55 @@
       السورة السابقة <i class="fa-solid fa-chevron-left"></i>
     </a>
     {% else %}<div></div>{% endif %}
+  </div>
+
+  <div class="fixed bottom-0 inset-x-0 z-40 player-shell px-4 py-3">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-[1fr,auto] gap-4 items-center">
+      <div>
+        <div class="flex flex-wrap items-center gap-3 text-sm">
+          <span id="player-current-ayah" class="px-3 py-2 rounded-full border border-[#c9a84c]/20 text-[#f0c060]">Aucun verset actif</span>
+          <label class="text-[#8b949e]">Vitesse
+            <select id="audio-speed" class="ml-2 rounded-full border border-[#c9a84c]/25 bg-transparent px-3 py-2 text-white">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+            </select>
+          </label>
+          <label class="text-[#8b949e]">Loop
+            <select id="audio-loop-count" class="ml-2 rounded-full border border-[#c9a84c]/25 bg-transparent px-3 py-2 text-white">
+              <option value="1">1x</option>
+              <option value="3">3x</option>
+              <option value="5">5x</option>
+              <option value="10">10x</option>
+              <option value="infinite">Infini</option>
+            </select>
+          </label>
+          <label class="text-[#8b949e]">Pause
+            <select id="audio-loop-pause" class="ml-2 rounded-full border border-[#1a6b4a]/25 bg-transparent px-3 py-2 text-white">
+              <option value="0">0s</option>
+              <option value="2">2s</option>
+              <option value="5">5s</option>
+              <option value="10">10s</option>
+            </select>
+          </label>
+          <span id="audio-loop-counter" class="px-3 py-2 rounded-full border border-[#1a6b4a]/25 text-[#9de3c4]">Lecture 0/0</span>
+        </div>
+        <div class="mt-3">
+          <audio id="surah-audio-player" controls class="w-full"></audio>
+        </div>
+      </div>
+      <div id="immersive-panel" class="hidden rounded-2xl border border-[#c9a84c]/20 bg-black/25 p-4">
+        <p class="text-[#f0c060] text-xs uppercase tracking-[0.3em]">Immersif</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button type="button" class="immersive-preset px-3 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]" data-surface="night">Sombre</button>
+          <button type="button" class="immersive-preset px-3 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]" data-surface="parchment">Parchemin</button>
+          <button type="button" class="immersive-preset px-3 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]" data-surface="day">Blanc</button>
+          <button type="button" class="immersive-preset px-3 py-2 rounded-full border border-[#1a6b4a]/25 text-[#9de3c4]" data-surface="green">Vert</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="verse-share-modal" class="hidden fixed inset-0 z-[120] side-panel-backdrop px-4 py-6 sm:py-10">
@@ -335,11 +524,18 @@
           {% endfor %}
         </select>
       </div>
+      <div class="mt-6 flex flex-wrap gap-2">
+        <button type="button" class="tafsir-tab is-active px-4 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]" data-tab="classic">Ibn Kathir</button>
+        <button type="button" class="tafsir-tab px-4 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]" data-tab="simple">Explication simple</button>
+      </div>
       <div class="mt-6 rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5">
         <p id="tafsir-arabic" class="font-amiri text-3xl text-white leading-loose text-right" dir="rtl"></p>
       </div>
-      <div class="mt-6 rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5">
+      <div class="mt-6 rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5" id="tafsir-classic-pane">
         <p id="tafsir-text" class="text-[#e6edf3] whitespace-pre-line"></p>
+      </div>
+      <div class="mt-6 rounded-2xl border border-[#1a6b4a]/15 bg-[#1a6b4a]/10 p-5 hidden" id="tafsir-simple-pane">
+        <p id="tafsir-simple-text" class="text-[#e6edf3] whitespace-pre-line"></p>
       </div>
     </div>
   </div>
@@ -367,35 +563,53 @@
       </div>
     </div>
   </div>
+
+  <div id="word-panel" class="hidden fixed inset-0 z-[126] side-panel-backdrop">
+    <div class="absolute inset-y-0 right-0 w-full max-w-lg bg-[#0d1117] border-l border-[#c9a84c]/20 p-6 sm:p-8 overflow-y-auto">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[#f0c060] uppercase tracking-[0.35em] text-xs">Lecture mot par mot</p>
+          <h2 id="word-panel-title" class="font-cinzel text-2xl text-white mt-2">Mot</h2>
+        </div>
+        <button type="button" id="close-word-panel" class="h-10 w-10 rounded-full border border-[#c9a84c]/20 text-[#c9a84c]">x</button>
+      </div>
+      <div class="mt-6 rounded-2xl border border-[#c9a84c]/15 bg-white/5 p-5">
+        <p id="word-panel-arabic" class="font-amiri text-4xl text-white text-right" dir="rtl"></p>
+        <p id="word-panel-transliteration" class="italic text-[#c9a84c]/80 mt-3"></p>
+        <p id="word-panel-translation" class="text-[#e6edf3] mt-4"></p>
+        <p id="word-panel-root" class="text-[#8b949e] mt-4"></p>
+      </div>
+      <button type="button" id="play-word-audio" class="mt-5 px-4 py-3 rounded-xl border border-[#1a6b4a]/35 text-[#9de3c4] hover:bg-[#1a6b4a]/10">Ecouter le mot</button>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-const audio = new Audio();
+const audio = document.getElementById('surah-audio-player') || new Audio();
 let activeVerse = null;
 let currentShareVerse = null;
 let currentTafsirReference = null;
 let mediaRecorder = null;
 let mediaChunks = [];
+let loopState = { verseNum: null, current: 0, total: 1, pause: 0 };
+let currentWordAudio = null;
 
 function playAyah(verseNum, audioUrl) {
   if (!audioUrl) return;
   if (activeVerse) document.getElementById('ayah-' + activeVerse)?.classList.remove('ayah-active');
-  if (activeVerse === verseNum && !audio.paused) {
-    audio.pause();
-    activeVerse = null;
-    return;
-  }
   activeVerse = verseNum;
+  loopState.verseNum = verseNum;
+  loopState.current = 1;
   document.getElementById('ayah-' + verseNum)?.classList.add('ayah-active');
   audio.src = audioUrl;
   audio.play();
+  document.getElementById('player-current-ayah')?.replaceChildren(document.createTextNode(`Ayah ${verseNum}`));
+  const loopCount = document.getElementById('audio-loop-count');
+  const loopCounter = document.getElementById('audio-loop-counter');
+  if (loopCounter) loopCounter.textContent = `Lecture 1/${loopCount?.value === 'infinite' ? 'infini' : (loopCount?.value || '1')}`;
   document.getElementById('ayah-' + verseNum)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  audio.onended = () => {
-    document.getElementById('ayah-' + verseNum)?.classList.remove('ayah-active');
-    activeVerse = null;
-  };
 }
 
 (function () {
@@ -410,9 +624,34 @@ function playAyah(verseNum, audioUrl) {
     if (window.toast) window.toast(message, type);
   }
 
+  function getSetting(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw === null ? fallback : raw;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function setSetting(key, value) {
+    try { localStorage.setItem(key, String(value)); } catch (e) {}
+  }
+
   const csrfToken = getCookie('csrftoken');
   const reader = document.getElementById('surah-reader');
+  const mushafContent = document.getElementById('mushaf-content');
   const tajweedToggle = document.getElementById('tajweed-toggle');
+  const transliterationToggle = document.getElementById('transliteration-toggle');
+  const wordByWordToggle = document.getElementById('word-by-word-toggle');
+  const translationToggle = document.getElementById('translation-toggle');
+  const immersiveToggle = document.getElementById('immersive-toggle');
+  const immersivePanel = document.getElementById('immersive-panel');
+  const arabicSizeDown = document.getElementById('arabic-size-down');
+  const arabicSizeUp = document.getElementById('arabic-size-up');
+  const translationSizeDown = document.getElementById('translation-size-down');
+  const translationSizeUp = document.getElementById('translation-size-up');
+  const arabicFontSelector = document.getElementById('arabic-font-selector');
+  const readerSurfaceSelector = document.getElementById('reader-surface-selector');
   const readForm = document.getElementById('read-surah-form');
   const readButton = document.getElementById('toggle-read-surah');
   const readStatusBadge = document.getElementById('read-status-badge');
@@ -434,7 +673,10 @@ function playAyah(verseNum, audioUrl) {
   const tafsirReference = document.getElementById('tafsir-reference');
   const tafsirArabic = document.getElementById('tafsir-arabic');
   const tafsirText = document.getElementById('tafsir-text');
+  const tafsirSimpleText = document.getElementById('tafsir-simple-text');
   const tafsirEdition = document.getElementById('tafsir-edition');
+  const tafsirClassicPane = document.getElementById('tafsir-classic-pane');
+  const tafsirSimplePane = document.getElementById('tafsir-simple-pane');
 
   const recitationPanel = document.getElementById('recitation-panel');
   const closeRecitationPanel = document.getElementById('close-recitation-panel');
@@ -443,6 +685,20 @@ function playAyah(verseNum, audioUrl) {
   const recitationFeedback = document.getElementById('recitation-feedback');
   const recitationTranscript = document.getElementById('recitation-transcript');
   const recitationWords = document.getElementById('recitation-words');
+  const wordPanel = document.getElementById('word-panel');
+  const closeWordPanel = document.getElementById('close-word-panel');
+  const wordPanelTitle = document.getElementById('word-panel-title');
+  const wordPanelArabic = document.getElementById('word-panel-arabic');
+  const wordPanelTransliteration = document.getElementById('word-panel-transliteration');
+  const wordPanelTranslation = document.getElementById('word-panel-translation');
+  const wordPanelRoot = document.getElementById('word-panel-root');
+  const playWordAudio = document.getElementById('play-word-audio');
+  const speedSelect = document.getElementById('audio-speed');
+  const loopCountSelect = document.getElementById('audio-loop-count');
+  const loopPauseSelect = document.getElementById('audio-loop-pause');
+  const loopCounter = document.getElementById('audio-loop-counter');
+  let wordByWordCache = {};
+  let currentWord = null;
 
   function applyTajweedMode(enabled) {
     reader.classList.toggle('tajweed-off', !enabled);
@@ -454,14 +710,147 @@ function playAyah(verseNum, audioUrl) {
       }
     });
     tajweedToggle.textContent = `Mode Tajweed ${enabled ? 'ON' : 'OFF'}`;
-    try { localStorage.setItem('nur-tajweed-mode', enabled ? '1' : '0'); } catch (e) {}
+    setSetting('nur-tajweed-mode', enabled ? '1' : '0');
+    if (reader.dataset.wordByWord === '1') hydrateWordTokens();
   }
 
-  const tajweedEnabled = (() => {
-    try { return localStorage.getItem('nur-tajweed-mode') === '1'; } catch (e) { return false; }
-  })();
+  function applyTransliterationMode(enabled) {
+    reader.classList.toggle('show-transliteration', enabled);
+    transliterationToggle.textContent = `Translitteration ${enabled ? 'ON' : 'OFF'}`;
+    setSetting('nur-transliteration-mode', enabled ? '1' : '0');
+  }
+
+  function applyTranslationVisibility(enabled) {
+    reader.classList.toggle('hide-translation', !enabled);
+    translationToggle.textContent = `Traduction ${enabled ? 'ON' : 'OFF'}`;
+    setSetting('nur-translation-visible', enabled ? '1' : '0');
+  }
+
+  function applyArabicSize(sizePx) {
+    const clamped = Math.max(18, Math.min(48, sizePx));
+    reader.style.setProperty('--reader-arabic-size', `${clamped}px`);
+    setSetting('nur-arabic-size', clamped);
+  }
+
+  function applyTranslationSize(sizePx) {
+    const clamped = Math.max(12, Math.min(22, sizePx));
+    reader.style.setProperty('--reader-translation-size', `${clamped}px`);
+    setSetting('nur-translation-size', clamped);
+  }
+
+  function applyArabicFont(fontValue) {
+    reader.style.setProperty('--reader-arabic-font', fontValue);
+    if (arabicFontSelector) arabicFontSelector.value = fontValue;
+    setSetting('nur-arabic-font', fontValue);
+  }
+
+  function applyReaderSurface(surface) {
+    reader.classList.remove('reader-theme-green');
+    if (surface === 'green') {
+      reader.classList.add('reader-theme-green');
+      window.setThemeMode?.('night');
+    } else {
+      window.setThemeMode?.(surface);
+    }
+    if (readerSurfaceSelector) readerSurfaceSelector.value = surface;
+    setSetting('nur-reader-surface', surface);
+  }
+
+  function toggleImmersive(forceValue = null) {
+    const enabled = forceValue === null ? !document.body.classList.contains('immersive-active') : forceValue;
+    document.body.classList.toggle('immersive-active', enabled);
+    immersivePanel?.classList.toggle('hidden', !enabled);
+    immersiveToggle.textContent = enabled ? 'Quitter immersif' : 'Mode immersif';
+    setSetting('nur-immersive-mode', enabled ? '1' : '0');
+  }
+
+  function hydrateWordTokens() {
+    document.querySelectorAll('[data-verse-reference]').forEach((wrapper) => {
+      const textEl = wrapper.querySelector('.ayah-text');
+      if (!textEl) return;
+      const source = reader.classList.contains('tajweed-off') ? (textEl.dataset.plainText || '') : (textEl.dataset.tajweedHtml || textEl.dataset.plainText || '');
+      const plain = source.replace(/<[^>]+>/g, ' ');
+      const words = plain.trim().split(/\s+/).filter(Boolean);
+      if (!words.length) return;
+      textEl.innerHTML = words.map((word, index) => `<span class="word-token" data-word-index="${index}">${word}</span>`).join(' ');
+      wrapper.classList.add('word-by-word-active');
+    });
+  }
+
+  function removeWordTokens() {
+    document.querySelectorAll('[data-verse-reference]').forEach((wrapper) => {
+      const textEl = wrapper.querySelector('.ayah-text');
+      if (!textEl) return;
+      if (reader.classList.contains('tajweed-off')) {
+        textEl.textContent = textEl.dataset.plainText || '';
+      } else {
+        textEl.innerHTML = textEl.dataset.tajweedHtml || textEl.dataset.plainText || '';
+      }
+      wrapper.classList.remove('word-by-word-active');
+    });
+  }
+
+  function applyWordByWordMode(enabled) {
+    reader.dataset.wordByWord = enabled ? '1' : '0';
+    wordByWordToggle.textContent = `Mot a mot ${enabled ? 'ON' : 'OFF'}`;
+    setSetting('nur-word-by-word-mode', enabled ? '1' : '0');
+    if (enabled) hydrateWordTokens();
+    else removeWordTokens();
+  }
+
+  function setTafsirTab(tab) {
+    document.querySelectorAll('.tafsir-tab').forEach((button) => {
+      button.classList.toggle('is-active', button.dataset.tab === tab);
+    });
+    tafsirClassicPane?.classList.toggle('hidden', tab !== 'classic');
+    tafsirSimplePane?.classList.toggle('hidden', tab !== 'simple');
+  }
+
+  function updateLoopCounter() {
+    const totalValue = loopCountSelect?.value === 'infinite' ? 'infini' : (loopCountSelect?.value || '1');
+    if (loopCounter) loopCounter.textContent = `Lecture ${loopState.current}/${totalValue}`;
+  }
+
+  const tajweedEnabled = getSetting('nur-tajweed-mode', '0') === '1';
+  const transliterationEnabled = getSetting('nur-transliteration-mode', '0') === '1';
+  const translationVisible = getSetting('nur-translation-visible', '1') === '1';
+  const wordByWordEnabled = getSetting('nur-word-by-word-mode', '0') === '1';
   applyTajweedMode(tajweedEnabled);
+  applyTransliterationMode(transliterationEnabled);
+  applyTranslationVisibility(translationVisible);
+  applyArabicSize(parseInt(getSetting('nur-arabic-size', '26'), 10));
+  applyTranslationSize(parseInt(getSetting('nur-translation-size', '16'), 10));
+  applyArabicFont(getSetting('nur-arabic-font', "'Amiri Quran'"));
+  applyReaderSurface(getSetting('nur-reader-surface', 'night'));
+  setTafsirTab('classic');
+  if (wordByWordEnabled) applyWordByWordMode(true);
+  if (getSetting('nur-immersive-mode', '0') === '1') toggleImmersive(true);
   tajweedToggle?.addEventListener('click', () => applyTajweedMode(reader.classList.contains('tajweed-off')));
+  transliterationToggle?.addEventListener('click', () => applyTransliterationMode(!reader.classList.contains('show-transliteration')));
+  translationToggle?.addEventListener('click', () => applyTranslationVisibility(reader.classList.contains('hide-translation')));
+  wordByWordToggle?.addEventListener('click', () => applyWordByWordMode(reader.dataset.wordByWord !== '1'));
+  immersiveToggle?.addEventListener('click', () => toggleImmersive());
+  document.querySelectorAll('.immersive-preset').forEach((button) => {
+    button.addEventListener('click', () => applyReaderSurface(button.dataset.surface));
+  });
+  arabicSizeDown?.addEventListener('click', () => applyArabicSize(parseInt(getSetting('nur-arabic-size', '26'), 10) - 2));
+  arabicSizeUp?.addEventListener('click', () => applyArabicSize(parseInt(getSetting('nur-arabic-size', '26'), 10) + 2));
+  translationSizeDown?.addEventListener('click', () => applyTranslationSize(parseInt(getSetting('nur-translation-size', '16'), 10) - 1));
+  translationSizeUp?.addEventListener('click', () => applyTranslationSize(parseInt(getSetting('nur-translation-size', '16'), 10) + 1));
+  arabicFontSelector?.addEventListener('change', (event) => applyArabicFont(event.target.value));
+  readerSurfaceSelector?.addEventListener('change', (event) => applyReaderSurface(event.target.value));
+
+  speedSelect.value = getSetting('nur-audio-speed', '1');
+  audio.playbackRate = parseFloat(speedSelect.value || '1');
+  loopCountSelect.value = getSetting('nur-audio-loop-count', '1');
+  loopPauseSelect.value = getSetting('nur-audio-loop-pause', '0');
+  updateLoopCounter();
+  speedSelect?.addEventListener('change', () => {
+    audio.playbackRate = parseFloat(speedSelect.value || '1');
+    setSetting('nur-audio-speed', speedSelect.value);
+  });
+  loopCountSelect?.addEventListener('change', () => setSetting('nur-audio-loop-count', loopCountSelect.value));
+  loopPauseSelect?.addEventListener('change', () => setSetting('nur-audio-loop-pause', loopPauseSelect.value));
 
   readForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -620,6 +1009,7 @@ function playAyah(verseNum, audioUrl) {
     tafsirReference.textContent = `Tafsir ${currentTafsirReference}`;
     tafsirArabic.textContent = 'Chargement...';
     tafsirText.textContent = 'Chargement...';
+    tafsirSimpleText.textContent = 'Chargement...';
     try {
       const response = await fetch(`/quran/tafsir/?reference=${encodeURIComponent(currentTafsirReference)}&edition=${encodeURIComponent(tafsirEdition.value)}`);
       const data = await response.json();
@@ -627,9 +1017,11 @@ function playAyah(verseNum, audioUrl) {
       tafsirReference.textContent = `${data.label} • ${data.reference}`;
       tafsirArabic.textContent = data.arabic_text;
       tafsirText.textContent = data.tafsir_text || 'Tafsir indisponible pour ce verset.';
+      tafsirSimpleText.textContent = data.simple_text || data.translation_fr || 'Explication simple indisponible.';
     } catch (error) {
       tafsirArabic.textContent = '';
       tafsirText.textContent = 'Impossible de charger le tafsir pour le moment.';
+      tafsirSimpleText.textContent = 'Impossible de charger l explication simple.';
     }
   }
 
@@ -639,6 +1031,9 @@ function playAyah(verseNum, audioUrl) {
       tafsirPanel.classList.remove('hidden');
       await loadTafsir();
     });
+  });
+  document.querySelectorAll('.tafsir-tab').forEach((button) => {
+    button.addEventListener('click', () => setTafsirTab(button.dataset.tab));
   });
   tafsirEdition?.addEventListener('change', loadTafsir);
   closeTafsirPanel?.addEventListener('click', () => tafsirPanel.classList.add('hidden'));
@@ -714,8 +1109,93 @@ function playAyah(verseNum, audioUrl) {
     });
   });
 
+  audio.addEventListener('ended', () => {
+    if (!activeVerse) return;
+    const repeatValue = loopCountSelect?.value === 'infinite' ? Infinity : parseInt(loopCountSelect?.value || '1', 10);
+    const pauseSeconds = parseInt(loopPauseSelect?.value || '0', 10);
+    if (repeatValue <= 1) {
+      document.getElementById(`ayah-${activeVerse}`)?.classList.remove('ayah-active');
+      activeVerse = null;
+      updateLoopCounter();
+      return;
+    }
+    loopState.current += 1;
+    updateLoopCounter();
+    if (repeatValue !== Infinity && loopState.current > repeatValue) {
+      document.getElementById(`ayah-${activeVerse}`)?.classList.remove('ayah-active');
+      activeVerse = null;
+      loopState.current = 0;
+      updateLoopCounter();
+      return;
+    }
+    window.setTimeout(() => {
+      audio.currentTime = 0;
+      audio.play();
+    }, pauseSeconds * 1000);
+  });
+
+  async function fetchVerseWords(reference) {
+    if (wordByWordCache[reference]) return wordByWordCache[reference];
+    const response = await fetch(`/quran/words/?reference=${encodeURIComponent(reference)}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Erreur');
+    wordByWordCache[reference] = data.words || [];
+    return wordByWordCache[reference];
+  }
+
+  async function openWordDetails(reference, wordIndex) {
+    try {
+      const words = await fetchVerseWords(reference);
+      const word = words[wordIndex];
+      if (!word) return;
+      currentWord = word;
+      wordPanelTitle.textContent = `${reference} - mot ${wordIndex + 1}`;
+      wordPanelArabic.textContent = word.text || '';
+      wordPanelTransliteration.textContent = word.transliteration || 'Translitteration indisponible';
+      wordPanelTranslation.textContent = word.translation || 'Traduction indisponible';
+      wordPanelRoot.textContent = word.root || 'Racine indisponible';
+      wordPanel.classList.remove('hidden');
+    } catch (error) {
+      showToast('Le mode mot a mot est indisponible pour ce verset.', 'warning');
+    }
+  }
+
+  mushafContent?.addEventListener('click', (event) => {
+    const token = event.target.closest('.word-token');
+    const verseWrapper = event.target.closest('[data-verse-reference]');
+    if (!token || !verseWrapper || reader.dataset.wordByWord !== '1') return;
+    openWordDetails(verseWrapper.dataset.verseReference, parseInt(token.dataset.wordIndex || '0', 10));
+  });
+
+  playWordAudio?.addEventListener('click', () => {
+    if (!currentWord?.audio_url) return;
+    const source = currentWord.audio_url.startsWith('http')
+      ? currentWord.audio_url
+      : `https://audio.qurancdn.com/${currentWord.audio_url.replace(/^\/+/, '')}`;
+    if (currentWordAudio) currentWordAudio.pause();
+    currentWordAudio = new Audio(source);
+    currentWordAudio.play();
+  });
+
+  closeWordPanel?.addEventListener('click', () => wordPanel.classList.add('hidden'));
+  wordPanel?.addEventListener('click', (event) => { if (event.target === wordPanel) wordPanel.classList.add('hidden'); });
   closeRecitationPanel?.addEventListener('click', () => recitationPanel.classList.add('hidden'));
   recitationPanel?.addEventListener('click', (event) => { if (event.target === recitationPanel) recitationPanel.classList.add('hidden'); });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      shareModal?.classList.add('hidden');
+      tafsirPanel?.classList.add('hidden');
+      recitationPanel?.classList.add('hidden');
+      wordPanel?.classList.add('hidden');
+      if (document.body.classList.contains('immersive-active')) toggleImmersive(false);
+    }
+    if (event.code === 'Space' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)) {
+      event.preventDefault();
+      if (audio.paused) audio.play();
+      else audio.pause();
+    }
+    if (event.key.toLowerCase() === 'b') readButton?.click();
+  });
 })();
 </script>
 {% endblock %}

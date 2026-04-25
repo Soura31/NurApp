@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Groupes de lecture | NurCoran{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="font-cinzel text-4xl text-white">Groupes de lecture</h1>
+      <p class="text-[#8b949e] mt-2">Objectifs communs, progression collective, chat de groupe et classement membres.</p>
+    </div>
+  </div>
+
+  <form method="post" class="mt-8 rounded-3xl border border-[#c9a84c]/20 bg-[#0d1117] p-6 grid md:grid-cols-4 gap-3">
+    {% csrf_token %}
+    <input name="name" placeholder="Nom du groupe" class="rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white">
+    <input name="description" placeholder="Description" class="rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white md:col-span-2">
+    <input name="target_days" type="number" value="30" min="1" class="rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white">
+    <button class="md:col-span-4 justify-self-start px-5 py-3 rounded-2xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Creer un groupe</button>
+  </form>
+
+  <div class="grid xl:grid-cols-2 gap-6 mt-8">
+    {% for group in groups %}
+    <article class="rounded-3xl border border-[#c9a84c]/20 bg-[#161b22] p-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h2 class="text-white text-2xl font-semibold">{{ group.name }}</h2>
+          <p class="text-[#8b949e] mt-2">{{ group.description }}</p>
+        </div>
+        <span class="px-3 py-2 rounded-full border border-[#c9a84c]/25 text-[#c9a84c]">{{ group.target_days }} jours</span>
+      </div>
+
+      <div class="mt-5 grid sm:grid-cols-3 gap-3">
+        {% for member in group.memberships.all|slice:":3" %}
+        <div class="rounded-2xl border border-white/10 bg-[#0d1117] p-4">
+          <p class="text-white font-semibold">{{ member.user.username }}</p>
+          <p class="text-[#8b949e] text-sm mt-1">Juz {{ member.assigned_juz|default:"-" }}</p>
+          <p class="text-[#c9a84c] text-sm mt-2">{{ member.progress_percent }}%</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        {% if group.id not in my_membership_ids %}
+        <form method="post" action="/groupes/{{ group.slug }}/rejoindre/">{% csrf_token %}
+          <button class="px-4 py-3 rounded-2xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Rejoindre</button>
+        </form>
+        {% else %}
+        <span class="px-4 py-3 rounded-2xl border border-[#c9a84c]/25 text-[#c9a84c]">Membre</span>
+        {% endif %}
+      </div>
+
+      {% if group.id in my_membership_ids %}
+      <form method="post" action="/groupes/{{ group.slug }}/message/" class="mt-5 flex gap-3">
+        {% csrf_token %}
+        <input name="content" placeholder="Message du groupe" class="flex-1 rounded-2xl bg-[#0f1419] border border-[#c9a84c]/35 px-4 py-3 text-white">
+        <button class="px-4 py-3 rounded-2xl text-[#080c10] font-semibold" style="background:var(--nur-gold-gradient)">Envoyer</button>
+      </form>
+      {% endif %}
+
+      <div class="mt-4 space-y-2">
+        {% for message in group.messages.all|slice:":3" %}
+        <div class="rounded-2xl border border-white/10 bg-[#0d1117] p-3">
+          <p class="text-white text-sm"><span class="text-[#c9a84c]">{{ message.author.username }}</span> - {{ message.content }}</p>
+        </div>
+        {% empty %}
+        <p class="text-[#8b949e] text-sm">Pas encore de messages.</p>
+        {% endfor %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
